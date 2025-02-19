@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo, useCallback } from "react";
+import Cookies from "js-cookie";
 import {
   Table,
   TableBody,
@@ -10,55 +11,19 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { ChevronDown, ChevronUp, ChevronsUpDown, Search } from "lucide-react";
-import { ViewSwitcher } from "./ViewSwitcher";
+import {
+  ChevronDown,
+  ChevronUp,
+  ChevronsUpDown,
+  List,
+  Search,
+} from "lucide-react";
+import { ViewSwitcher } from "@/components/ViewSwitcher";
 import { Badge } from "@/components/ui/badge";
+import { ViewOptionsOverlay } from "@/components/ViewOptionsOverlay";
 
-interface FlightLog {
-  id: string;
-  date: string;
-  departure: string;
-  departure_runway: string;
-  timeOffBlock: string;
-  timeTakeOff: string; // Time available?
-  destination: string;
-  destination_runway: string;
-  timeLanding: string;
-  timeOnBlock: string;
-  aircraftType: string;
-  aircraftRegistration: string;
-  hobbsOut: number;
-  hobbsIn: number;
-  timeSingleEngine: string;
-  timeMultiEngine: string;
-  timeMultiPilot: string;
-  totalBlockTime: string;
-  totalAirTime: string;
-  picName: string;
-  takeoffDay: number;
-  takeoffNight: number;
-  landingDay: number;
-  landingNight: number;
-  timeNight: string;
-  timeIfr: string;
-  timeXc: string;
-  isSolo: boolean;
-  isSpic: boolean;
-  isPicus: boolean;
-  timePic: string;
-  timeCopilot: string;
-  timeDual: string;
-  timeInstructor: string;
-  simulatorDate: string;
-  simulatorType: string;
-  timeSimulator: string;
-  approachType: string;
-  operationType: string;
-  passengerCount: number;
-  trainingDescription: string;
-  remarksEndorsements: string;
-  signature: string;
-}
+import { FlightLog } from "@/schemas/flight";
+import { Button } from "@/components/ui/button";
 
 type SortDirection = "asc" | "desc" | null;
 
@@ -157,6 +122,7 @@ const columns: Column[] = [
 
 export default function FlightLogTable() {
   const [flightLogs, setFlightLogs] = useState<FlightLog[]>([]);
+  const [originalFlightLogs, setOriginalFlightLogs] = useState<FlightLog[]>([]);
   const [visibleColumns, setVisibleColumns] = useState<(keyof FlightLog)[]>(
     columns.filter((col) => !col.defaultHidden).map((col) => col.key)
   );
@@ -171,16 +137,18 @@ export default function FlightLogTable() {
     column: null,
     direction: null,
   });
-  const [showRunwayDesignator, setShowRunwayDesignator] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+
+  const [showViewOptions, setShowViewOptions] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       fetchFlightLogs();
-      // const savedOrder = Cookies.get('columnOrder')
-      // if (savedOrder) {
-      //   setColumnOrder(JSON.parse(savedOrder))
-      // }
+      const savedOrder = Cookies.get("columnOrder");
+      if (savedOrder) {
+        setColumnOrder(JSON.parse(savedOrder));
+      }
     }
   }, []);
 
@@ -201,10 +169,23 @@ export default function FlightLogTable() {
     //   console.error('Error fetching flight logs:', error)
     //   setError(error.message)
     // } else {
-    setFlightLogs(data.data);
+
+    const flights = applyDefaultSorting(data.data);
+    setFlightLogs(flights);
+    setOriginalFlightLogs(flights);
     setError(null);
     // }
   }
+
+  const applyDefaultSorting = (logs: FlightLog[]) => {
+    return [...logs].sort((a, b) => {
+      const parseDate = (date: string) => {
+        const [day, month, year] = date.split("/").map(Number);
+        return new Date(year, month - 1, day).getTime();
+      };
+      return parseDate(b.date) - parseDate(a.date);
+    });
+  };
 
   const toggleColumn = (columnKey: string) => {
     setVisibleColumns((prev) =>
@@ -214,13 +195,18 @@ export default function FlightLogTable() {
     );
   };
 
-  // const updateColumnOrder = (newOrder: (keyof FlightLog)[]) => {
-  //   setColumnOrder(newOrder);
-  //   Cookies.set("columnOrder", JSON.stringify(newOrder), { expires: 365 });
-  // };
+  const updateColumnOrder = (newOrder: (keyof FlightLog)[]) => {
+    setColumnOrder(newOrder);
+    Cookies.set("columnOrder", JSON.stringify(newOrder), { expires: 365 });
+  };
 
   const sortData = (column: keyof FlightLog, direction: SortDirection) => {
     setSorting({ column, direction });
+
+    if (direction === null) {
+      setFlightLogs([...originalFlightLogs]); // Reset to original order if neutral
+      return;
+    }
 
     const sortedData = [...flightLogs].sort((a, b) => {
       const columnDef = columns.find((col) => col.key === column);
@@ -239,17 +225,21 @@ export default function FlightLogTable() {
             ? Number(valueA) - Number(valueB)
             : Number(valueB) - Number(valueA);
         case "date":
+          const parseDate = (dateStr: string) => {
+            const [day, month, year] = dateStr.split("/").map(Number);
+            return new Date(year, month - 1, day).getTime();
+          };
           return direction === "asc"
-            ? Date.parse(valueA) - Date.parse(valueB)
-            : Date.parse(valueB) - Date.parse(valueA);
+            ? parseDate(String(valueA)) - parseDate(String(valueB))
+            : parseDate(String(valueB)) - parseDate(String(valueA));
         case "time":
           const timeToMinutes = (time: string) => {
             const [hours, minutes] = time.split(":").map(Number);
             return hours * 60 + minutes;
           };
           return direction === "asc"
-            ? timeToMinutes(valueA) - timeToMinutes(valueB)
-            : timeToMinutes(valueB) - timeToMinutes(valueA);
+            ? timeToMinutes(String(valueA)) - timeToMinutes(String(valueB))
+            : timeToMinutes(String(valueB)) - timeToMinutes(String(valueA));
         case "boolean":
           return direction === "asc"
             ? Number(valueA) - Number(valueB)
@@ -331,6 +321,25 @@ export default function FlightLogTable() {
           currentSort={sorting}
           updateColumnOrder={updateColumnOrder}
         /> */}
+
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => {
+            setShowViewOptions(true);
+            setIsOpen(false);
+          }}
+        >
+          <List className="h-4 w-4" />
+        </Button>
+
+        <ViewOptionsOverlay
+          isOpen={showViewOptions}
+          onClose={() => setShowViewOptions(false)}
+          visibleColumns={visibleColumns}
+          toggleColumn={toggleColumn}
+          updateColumnOrder={updateColumnOrder}
+        />
       </div>
       {error && (
         <div
@@ -355,16 +364,16 @@ export default function FlightLogTable() {
                     className={
                       column.sortable ? "cursor-pointer select-none" : ""
                     }
-                    onClick={() =>
-                      column.sortable &&
-                      sortData(
-                        column.key,
-                        sorting.column === column.key &&
-                          sorting.direction === "asc"
-                          ? "desc"
-                          : "asc"
-                      )
-                    }
+                    onClick={() => {
+                      if (!column.sortable) return;
+                      let newDirection: SortDirection = "asc";
+                      if (sorting.column === column.key) {
+                        if (sorting.direction === "asc") newDirection = "desc";
+                        else if (sorting.direction === "desc")
+                          newDirection = null;
+                      }
+                      sortData(column.key, newDirection);
+                    }}
                   >
                     <div className="flex items-center">
                       {column.label}
@@ -373,8 +382,10 @@ export default function FlightLogTable() {
                           {sorting.column === column.key ? (
                             sorting.direction === "asc" ? (
                               <ChevronUp className="h-4 w-4" />
-                            ) : (
+                            ) : sorting.direction === "desc" ? (
                               <ChevronDown className="h-4 w-4" />
+                            ) : (
+                              <ChevronsUpDown className="h-4 w-4 opacity-50" />
                             )
                           ) : (
                             <ChevronsUpDown className="h-4 w-4 opacity-50" />

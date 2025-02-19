@@ -34,3 +34,51 @@ export const flightSchema = z.object({
 });
 
 export type flightSchema = z.infer<typeof flightSchema>;
+
+export const FlightLog = z.object({
+  id: z.string(),
+  date: z.string(),
+  departure: z.string(),
+  departure_runway: z.string(),
+  timeOffBlock: z.string(),
+  timeTakeOff: z.string(), // Time available?
+  destination: z.string(),
+  destination_runway: z.string(),
+  timeLanding: z.string(),
+  timeOnBlock: z.string(),
+  aircraftType: z.string(),
+  aircraftRegistration: z.string(),
+  hobbsOut: z.number(),
+  hobbsIn: z.number(),
+  timeSingleEngine: z.string(),
+  timeMultiEngine: z.string(),
+  timeMultiPilot: z.string(),
+  totalBlockTime: z.string(),
+  totalAirTime: z.string(),
+  picName: z.string(),
+  takeoffDay: z.number(),
+  takeoffNight: z.number(),
+  landingDay: z.number(),
+  landingNight: z.number(),
+  timeNight: z.string(),
+  timeIfr: z.string(),
+  timeXc: z.string(),
+  isSolo: z.boolean(),
+  isSpic: z.boolean(),
+  isPicus: z.boolean(),
+  timePic: z.string(),
+  timeCopilot: z.string(),
+  timeDual: z.string(),
+  timeInstructor: z.string(),
+  simulatorDate: z.string(),
+  simulatorType: z.string(),
+  timeSimulator: z.string(),
+  approachType: z.string(),
+  operationType: z.string(),
+  passengerCount: z.number(),
+  trainingDescription: z.string(),
+  remarksEndorsements: z.string(),
+  signature: z.string(),
+});
+
+export type FlightLog = z.infer<typeof FlightLog>;
