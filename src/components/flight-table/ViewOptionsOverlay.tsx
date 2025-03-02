@@ -4,8 +4,8 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { ChevronRight } from "lucide-react";
-import { IOSButton } from "@/components/ios-button";
-import { ColumnsOverlay } from "@/components/ColumnsOverlay";
+import { IOSButton } from "@/components/flight-table/ios-button";
+import { ColumnsOverlay } from "@/components/flight-table/ColumnsOverlay";
 
 import { FlightLog } from "@/schemas/flight";
 
@@ -26,6 +26,7 @@ export function ViewOptionsOverlay({
 }: ViewOptionsOverlayProps) {
   const [showColumns, setShowColumns] = useState(false);
   const [showRunwayDesignator, setShowRunwayDesignator] = useState(false);
+  const [sortLatest, setSortLatest] = useState(true);
 
   const handleDone = () => {
     onClose();
@@ -78,10 +79,7 @@ export function ViewOptionsOverlay({
                   Sort your latest flight first
                 </div>
               </div>
-              <Switch
-                checked={showRunwayDesignator}
-                onCheckedChange={setShowRunwayDesignator}
-              />
+              <Switch checked={sortLatest} onCheckedChange={setShowColumns} />
             </div>
           </div>
         </DialogContent>

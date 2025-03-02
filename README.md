@@ -20,17 +20,23 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Learn More
+## Roadmap
 
-To learn more about Next.js, take a look at the following resources:
+Development roadmap to keep track of version feature developments.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Version 0.1.0 (initial)
+Initial application release.
+- [ ] Side navigation
+- [ ] Logbook, Pilots & Aircraft overview & manegement
+  - [ ] Logbook Flight Table
+    - [ ] Loading animation (Skeleton ShadCn)
+  - [ ] Logbook Flight Submit
+    - [x] [FIX] Time input button not centered
+    - [ ] Calculate time on change
+    - [ ] Tabs orient vertically stacked for mobile devices
+- [ ] Progressive Web App (PWA) (Capacitor?)
+- [ ] Update folder structure
+- [ ] Documentation using [Aria-Docs](https://github.com/nisabmohd/Aria-Docs)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Future releases
+- [ ] Offline functionality

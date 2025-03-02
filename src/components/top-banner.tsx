@@ -1,18 +1,10 @@
-import { Menu, Plus, List, Search } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { SidebarTrigger } from "./ui/sidebar";
 
-export function TopBanner({
-  onToggleNav,
-  isNavCollapsed,
-}: {
-  onToggleNav: () => void;
-  isNavCollapsed: boolean;
-}) {
+export function TopBanner() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-[#18181B]">
       <div className="flex h-14 items-center px-4">
-        <Button
+        {/* <Button
           variant="ghost"
           size="icon"
           onClick={onToggleNav}
@@ -24,7 +16,8 @@ export function TopBanner({
             <Menu className="h-5 w-5" />
           )}
           <span className="sr-only">Toggle navigation</span>
-        </Button>
+        </Button> */}
+        {/* <SidebarTrigger className="mr-2 text-white" /> */}
         <div className="flex flex-1 items-center justify-between">
           <p className="text-sm font-medium text-white">Digital Logbook</p>
           <div className="flex items-center space-x-4">

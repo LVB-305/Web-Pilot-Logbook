@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Check, List, ArrowDown, ArrowUp } from "lucide-react";
-import { ViewOptionsOverlay } from "@/components/ViewOptionsOverlay";
+import { ViewOptionsOverlay } from "@/components/flight-table/ViewOptionsOverlay";
 
 import { FlightLog } from "@/schemas/flight";
 

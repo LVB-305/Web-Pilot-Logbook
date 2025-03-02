@@ -30,7 +30,7 @@ export default async function handler(
 
     const response = await sheets.spreadsheets.values.append({
       spreadsheetId: process.env.SPREADSHEET_ID,
-      range: "A3:AP",
+      range: "Logbook!A3:AP",
       valueInputOption: "USER_ENTERED",
       requestBody: {
         values: [
@@ -55,7 +55,7 @@ export default async function handler(
             body.isSpic,
             body.isPicus,
             body.picName,
-            body.picId,
+            // body.picId,
             body.takeoffDay,
             body.takeoffNight,
             body.landingDay,

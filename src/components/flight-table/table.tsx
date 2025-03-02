@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, Suspense } from "react";
 import Cookies from "js-cookie";
 import {
   Table,
@@ -16,16 +16,23 @@ import {
   ChevronUp,
   ChevronsUpDown,
   List,
+  Plus,
   Search,
 } from "lucide-react";
-import { ViewSwitcher } from "@/components/ViewSwitcher";
 import { Badge } from "@/components/ui/badge";
-import { ViewOptionsOverlay } from "@/components/ViewOptionsOverlay";
+import { ViewOptionsOverlay } from "@/components/flight-table/ViewOptionsOverlay";
 
 import { FlightLog } from "@/schemas/flight";
 import { Button } from "@/components/ui/button";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import router from "next/router";
+import { Skeleton } from "@/components/ui/skeleton";
+import getFlights from "@/api/handler";
 
 type SortDirection = "asc" | "desc" | null;
+
+// TEMP
+const sortLatest = true;
 
 interface Column {
   key: keyof FlightLog;
@@ -138,6 +145,7 @@ export default function FlightLogTable() {
     direction: null,
   });
   const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setLoading] = useState(true); // Add loading state
 
   const [showViewOptions, setShowViewOptions] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -153,28 +161,26 @@ export default function FlightLogTable() {
   }, []);
 
   async function fetchFlightLogs() {
-    // const { data, error } = await supabase
-    //   .from('flight_logs')
-    //   .select('*')
+    try {
+      setLoading(true);
+      const response = await getFlights();
 
-    const result = await fetch(
-      "https://script.google.com/macros/s/AKfycbxP5EJZQdoKwIRYWFVTzrOIb3PnegIRH80Oqu-DDTv0ON2nAof6LatuOp5xZzKBKWE/exec"
-    );
+      setFlightLogs(response);
 
-    const data = await result.json();
+      const flights = applyDefaultSorting(response);
+      setFlightLogs(flights);
+      setOriginalFlightLogs(flights);
+      setError(null);
 
-    console.log(data);
-
-    // if (error) {
-    //   console.error('Error fetching flight logs:', error)
-    //   setError(error.message)
-    // } else {
-
-    const flights = applyDefaultSorting(data.data);
-    setFlightLogs(flights);
-    setOriginalFlightLogs(flights);
-    setError(null);
-    // }
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching flight logs:", error);
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError(String(error));
+      }
+    }
   }
 
   const applyDefaultSorting = (logs: FlightLog[]) => {
@@ -183,7 +189,11 @@ export default function FlightLogTable() {
         const [day, month, year] = date.split("/").map(Number);
         return new Date(year, month - 1, day).getTime();
       };
-      return parseDate(b.date) - parseDate(a.date);
+      if (sortLatest) {
+        return parseDate(b.date) - parseDate(a.date);
+      } else {
+        return parseDate(a.date) - parseDate(b.date);
+      }
     });
   };
 
@@ -302,147 +312,174 @@ export default function FlightLogTable() {
   }, [flightLogs, searchTerm, formatLocation]);
 
   return (
-    <div className="container mx-auto p-2 w-full">
-      <div className="mb-4 flex justify-between items-center">
-        <div className="relative w-64">
-          <Input
-            type="text"
-            placeholder="Search..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
+    <ScrollArea className="max-w-full">
+      <div className="container mx-auto p-2 w-full">
+        <div className="mb-4 flex justify-between items-center">
+          <div className="relative w-64">
+            <Input
+              type="text"
+              placeholder="Search..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+          </div>
+
+          <div className="space-x-2">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => {
+                setShowViewOptions(true);
+                setIsOpen(false);
+              }}
+            >
+              <List className="h-4 w-4" />
+            </Button>
+
+            <Button
+              variant="default"
+              size="icon"
+              onClick={() => router.push("/app/logbook/new")}
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
+          </div>
+
+          <ViewOptionsOverlay
+            isOpen={showViewOptions}
+            onClose={() => setShowViewOptions(false)}
+            visibleColumns={visibleColumns}
+            toggleColumn={toggleColumn}
+            updateColumnOrder={updateColumnOrder}
           />
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
         </div>
-        {/* <ViewSwitcher
-          visibleColumns={visibleColumns}
-          toggleColumn={toggleColumn}
-          sortColumn={sortData}
-          currentSort={sorting}
-          updateColumnOrder={updateColumnOrder}
-        /> */}
-
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => {
-            setShowViewOptions(true);
-            setIsOpen(false);
-          }}
-        >
-          <List className="h-4 w-4" />
-        </Button>
-
-        <ViewOptionsOverlay
-          isOpen={showViewOptions}
-          onClose={() => setShowViewOptions(false)}
-          visibleColumns={visibleColumns}
-          toggleColumn={toggleColumn}
-          updateColumnOrder={updateColumnOrder}
-        />
-      </div>
-      {error && (
-        <div
-          className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
-          role="alert"
-        >
-          <strong className="font-bold">Error:</strong>
-          <span className="block sm:inline"> {error}</span>
-        </div>
-      )}
-      <Table className="w-full">
-        <TableHeader>
-          <TableRow>
-            {columnOrder
-              .filter((col) => visibleColumns.includes(col))
-              .map((columnKey) => {
-                const column = columns.find((c) => c.key === columnKey);
-                if (!column) return null;
-                return (
-                  <TableHead
-                    key={column.key}
-                    className={
-                      column.sortable ? "cursor-pointer select-none" : ""
-                    }
-                    onClick={() => {
-                      if (!column.sortable) return;
-                      let newDirection: SortDirection = "asc";
-                      if (sorting.column === column.key) {
-                        if (sorting.direction === "asc") newDirection = "desc";
-                        else if (sorting.direction === "desc")
-                          newDirection = null;
+        {error && (
+          <div
+            className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
+            role="alert"
+          >
+            <strong className="font-bold">Error:</strong>
+            <span className="block sm:inline"> {error}</span>
+          </div>
+        )}
+        <Table className="w-full">
+          <TableHeader>
+            <TableRow>
+              {columnOrder
+                .filter((col) => visibleColumns.includes(col))
+                .map((columnKey) => {
+                  const column = columns.find((c) => c.key === columnKey);
+                  if (!column) return null;
+                  return (
+                    <TableHead
+                      key={column.key}
+                      className={
+                        column.sortable ? "cursor-pointer select-none" : ""
                       }
-                      sortData(column.key, newDirection);
-                    }}
-                  >
-                    <div className="flex items-center">
-                      {column.label}
-                      {column.sortable && (
-                        <span className="ml-2">
-                          {sorting.column === column.key ? (
-                            sorting.direction === "asc" ? (
-                              <ChevronUp className="h-4 w-4" />
-                            ) : sorting.direction === "desc" ? (
-                              <ChevronDown className="h-4 w-4" />
+                      onClick={() => {
+                        if (!column.sortable) return;
+                        let newDirection: SortDirection = "asc";
+                        if (sorting.column === column.key) {
+                          if (sorting.direction === "asc")
+                            newDirection = "desc";
+                          else if (sorting.direction === "desc")
+                            newDirection = null;
+                        }
+                        sortData(column.key, newDirection);
+                      }}
+                    >
+                      <div className="flex items-center">
+                        {column.label}
+                        {column.sortable && (
+                          <span className="ml-2">
+                            {sorting.column === column.key ? (
+                              sorting.direction === "asc" ? (
+                                <ChevronUp className="h-4 w-4" />
+                              ) : sorting.direction === "desc" ? (
+                                <ChevronDown className="h-4 w-4" />
+                              ) : (
+                                <ChevronsUpDown className="h-4 w-4 opacity-50" />
+                              )
                             ) : (
                               <ChevronsUpDown className="h-4 w-4 opacity-50" />
-                            )
-                          ) : (
-                            <ChevronsUpDown className="h-4 w-4 opacity-50" />
-                          )}
-                        </span>
-                      )}
-                    </div>
-                  </TableHead>
-                );
-              })}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {filteredLogs.length === 0 ? (
-            <TableRow>
-              <TableCell
-                colSpan={visibleColumns.length}
-                className="h-24 text-center"
-              >
-                {searchTerm ? (
-                  <span>`No results found for ${searchTerm}`</span>
-                ) : (
-                  <span>No flights found.</span>
-                )}
-              </TableCell>
+                            )}
+                          </span>
+                        )}
+                      </div>
+                    </TableHead>
+                  );
+                })}
             </TableRow>
-          ) : (
-            filteredLogs.map((log) => (
-              <TableRow key={log.id}>
-                {columnOrder
-                  .filter((col) => visibleColumns.includes(col))
-                  .map((columnKey) => (
-                    <TableCell key={`${log.id}-${columnKey}`}>
-                      {columnKey === "departure"
-                        ? formatLocation(log.departure, log.departure_runway)
-                        : columnKey === "destination"
-                        ? formatLocation(
-                            log.destination,
-                            log.destination_runway
-                          )
-                        : columnKey === "aircraftRegistration"
-                        ? formatAircraft(
-                            log.aircraftRegistration,
-                            log.aircraftType
-                          )
-                        : typeof log[columnKey] === "boolean"
-                        ? log[columnKey]
-                          ? "Yes"
-                          : "No"
-                        : log[columnKey]}
+          </TableHeader>
+          <TableBody>
+            {loading ? (
+              // Display skeletons while loading
+              Array.from({ length: 5 }).map((_, index) => (
+                <TableRow key={index}>
+                  {columnOrder
+                    .filter((col) => visibleColumns.includes(col))
+                    .map((columnKey) => (
+                      <TableCell key={`${index}-${columnKey}`}>
+                        <Skeleton className="h-6 w-[100px]" />
+                      </TableCell>
+                    ))}
+                </TableRow>
+              ))
+            ) : (
+              <Suspense fallback={<div>Loading...</div>}>
+                {filteredLogs.length === 0 ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={visibleColumns.length}
+                      className="h-24 text-center"
+                    >
+                      {searchTerm ? (
+                        <span>`No results found for ${searchTerm}`</span>
+                      ) : (
+                        <span>No flights found.</span>
+                      )}
                     </TableCell>
-                  ))}
-              </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
-    </div>
+                  </TableRow>
+                ) : (
+                  filteredLogs.map((log) => (
+                    <TableRow key={log.id}>
+                      {columnOrder
+                        .filter((col) => visibleColumns.includes(col))
+                        .map((columnKey) => (
+                          <TableCell key={`${log.id}-${columnKey}`}>
+                            {columnKey === "departure"
+                              ? formatLocation(
+                                  log.departure,
+                                  log.departure_runway
+                                )
+                              : columnKey === "destination"
+                              ? formatLocation(
+                                  log.destination,
+                                  log.destination_runway
+                                )
+                              : columnKey === "aircraftRegistration"
+                              ? formatAircraft(
+                                  log.aircraftRegistration,
+                                  log.aircraftType
+                                )
+                              : typeof log[columnKey] === "boolean"
+                              ? log[columnKey]
+                                ? "Yes"
+                                : "No"
+                              : log[columnKey]}
+                          </TableCell>
+                        ))}
+                    </TableRow>
+                  ))
+                )}
+              </Suspense>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+      <ScrollBar orientation="vertical" />
+    </ScrollArea>
   );
 }
