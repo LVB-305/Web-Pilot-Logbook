@@ -6,7 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { SearchCommand } from "@/components/NEW/search-command";
+import { SearchCommand } from "@/components/flight-form/search-command";
 
 interface SelectionDialogProps {
   open: boolean;
