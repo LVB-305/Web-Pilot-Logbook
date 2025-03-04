@@ -9,7 +9,6 @@ import {
   PlaneLanding,
   PlaneTakeoff,
   Plus,
-  Settings,
   Trash2,
   User,
   Wand,
@@ -27,11 +26,11 @@ import { ApproachDialog } from "./approach-dialog";
 import { ApproachEditDialog } from "./approach-edit-dialog";
 import { SectionFieldToggler } from "./section-field-toggler";
 import { DatePicker } from "@/components/ui/date-picker";
-import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { SignatureDialog } from "./signature-dialog";
 import { DecimalNumberInput } from "./decimal-number-input";
+import { PageHeader } from "../page-header";
 
 // TEMPORARY DATA MOCK
 const mockCrewMembers = [
@@ -414,8 +413,8 @@ export default function FlightForm({
   return (
     <div className="flex flex-col min-h-screen">
       {/* Header */}
-      {/* Split up in components */}
-      <header className="flex items-center justify-between p-4 border-b">
+      {/* Split up in components
+      <header className="sticky top-0 z-50 flex items-center justify-between p-4 border-b bg-white">
         <Button
           variant="ghost"
           size="icon"
@@ -424,6 +423,7 @@ export default function FlightForm({
         >
           <ChevronLeft className="w-6 h-6" />
         </Button>
+        <h2>Header To be placed</h2>
         <Button
           variant="ghost"
           className="text-orange-500 font-medium"
@@ -431,7 +431,22 @@ export default function FlightForm({
         >
           Save
         </Button>
-      </header>
+      </header> */}
+
+      <PageHeader
+        title={mode === "new" ? "New Flight" : "Edit Flight"}
+        backHref="/app/logbook"
+        showBackButton={true}
+        actionButton={
+          <Button
+            variant="ghost"
+            className="text-orange-500 font-medium"
+            onClick={handleSubmit}
+          >
+            Save
+          </Button>
+        }
+      />
 
       <div className="flex-1 overflow-auto pb-6">
         <FormSection title="Flight data" collapsible={false} defaultOpen={true}>
@@ -463,7 +478,7 @@ export default function FlightForm({
                 <Input
                   value={flightNumber}
                   onChange={(e) => setFlightNumber(e.target.value)}
-                  className="border-b border-t-0 border-l-0 border-r-0 rounded-none focus-visible:ring-0 px-0"
+                  className="border-b border-t-0 border-l-0 border-r-0 rounded-none focus-visible:ring-0 px-0 py-0 h-7"
                 />
               }
             />
@@ -474,7 +489,7 @@ export default function FlightForm({
               label="Registration"
               value={
                 getDisplayText(mockRegistrations, registration) ??
-                "Select registration..."
+                "Select registration"
               }
               icon={<Plane className="h-5 w-5 text-orange-500" />}
               onClick={() => setRegistrationDialogOpen(true)}
@@ -517,7 +532,7 @@ export default function FlightForm({
                 selectedPic
                   ? mockCrewMembers.find((cm) => cm.value === selectedPic)
                       ?.label
-                  : "Select PIC..."
+                  : "Select PIC"
               }
               icon={<User className="h-5 w-5 text-orange-500" />}
               onClick={() => setPicDialogOpen(true)}

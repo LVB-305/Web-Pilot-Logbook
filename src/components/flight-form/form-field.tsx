@@ -21,7 +21,7 @@ export function FormField({
   return (
     <div
       className={cn(
-        "flex items-center justify-between px-4 py-4",
+        "flex items-center justify-between px-3 py-3",
         onClick && "hover:bg-gray-50",
         className
       )}

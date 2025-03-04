@@ -1,172 +1,82 @@
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
+  SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarRail,
 } from "@/components/ui/sidebar";
-import {
-  BookOpen,
-  BookOpenCheck,
-  Box,
-  Code,
-  FileText,
-  HelpCircle,
-  Layout,
-  List,
-  LucideIcon,
-  Share2,
-  ShieldCheck,
-  Smartphone,
-  Users,
-  Zap,
-} from "lucide-react";
+import { Plane } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { NavUser } from "./nav/nav-user";
+import { navigation } from "@/lib/routes";
 
-interface NavItem {
-  title: string;
-  href: string;
-  icon: LucideIcon;
-}
+// TMP
+const data = {
+  user: {
+    name: "User Name",
+    email: "example@email.com",
+    avatar: "",
+  },
+};
 
-interface NavSection {
-  title: string;
-  items: NavItem[];
-}
-
-const navigation: NavSection[] = [
-  {
-    title: "Pilot Tools",
-    items: [
-      {
-        title: "Logbook",
-        href: "/logbook",
-        icon: BookOpenCheck,
-      },
-      {
-        title: "Contacts",
-        href: "/contacts",
-        icon: Users,
-      },
-      {
-        title: "Dev: Logbook Table",
-        href: "/dev",
-        icon: Code,
-      },
-    ],
-  },
-  {
-    title: "Getting Started",
-    items: [
-      {
-        title: "Introduction",
-        href: "/docs/introduction",
-        icon: BookOpen,
-      },
-      {
-        title: "Installation",
-        href: "/docs/installation",
-        icon: Box,
-      },
-      {
-        title: "Architecture",
-        href: "/docs/architecture",
-        icon: Layout,
-      },
-      {
-        title: "Best Practices",
-        href: "/docs/best-practices",
-        icon: Zap,
-      },
-    ],
-  },
-  {
-    title: "Components",
-    items: [
-      {
-        title: "Buttons",
-        href: "/docs/components/buttons",
-        icon: Smartphone,
-      },
-      {
-        title: "Forms",
-        href: "/docs/components/forms",
-        icon: FileText,
-      },
-      {
-        title: "Layout",
-        href: "/docs/components/layout",
-        icon: Layout,
-      },
-      {
-        title: "Navigation",
-        href: "/docs/components/navigation",
-        icon: List,
-      },
-    ],
-  },
-  {
-    title: "Resources",
-    items: [
-      {
-        title: "Examples",
-        href: "/docs/resources/examples",
-        icon: Code,
-      },
-      {
-        title: "Guidelines",
-        href: "/docs/resources/guidelines",
-        icon: ShieldCheck,
-      },
-      {
-        title: "Templates",
-        href: "/docs/resources/templates",
-        icon: Share2,
-      },
-      {
-        title: "Support",
-        href: "/docs/resources/support",
-        icon: HelpCircle,
-      },
-    ],
-  },
-];
-
-export function AppSidebar() {
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
-
   return (
-    <Sidebar
-      className="mt-14 transition-all duration-200 ease-in-out"
-      side="left"
-    >
+    <Sidebar {...props}>
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton size="lg" asChild>
+              <a href="#">
+                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                  <Plane className="size-4" />{" "}
+                </div>
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-semibold">
+                    Web Pilot Logbook
+                  </span>
+                  <span className="truncate text-xs">Online</span>
+                </div>
+              </a>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
       <SidebarContent>
-        {navigation.map((section) => (
-          <SidebarGroup key={section.title}>
-            <SidebarGroupLabel className="text-sm font-semibold text-foreground mb-2">
-              {section.title}
-            </SidebarGroupLabel>
-            <SidebarMenu>
-              {section.items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={pathname === item.href}
-                    className="justify-start w-full text-sm font-normal px-2 py-1"
-                  >
-                    <a href={item.href}>
-                      <item.icon className="h-4 w-4 mr-2" />
-                      <span>{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
+        {/* We create a SidebarGroup for each parent. */}
+        {navigation.map((item) => (
+          <SidebarGroup key={item.title}>
+            <SidebarGroupLabel>{item.title}</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {item.items.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={pathname === item.href}
+                    >
+                      <a href={item.href}>
+                        <item.icon className="h-4 w-4 mr-2" />
+                        <span>{item.title}</span>
+                      </a>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
           </SidebarGroup>
         ))}
       </SidebarContent>
+      <SidebarFooter>
+        <NavUser user={data.user} />
+      </SidebarFooter>
+      <SidebarRail />
     </Sidebar>
   );
 }

@@ -26,14 +26,17 @@ Development roadmap to keep track of version feature developments.
 
 ### Version 0.1.0 (initial)
 Initial application release.
-- [ ] Side navigation
+- [x] Side navigation & mobile navigtion
+- [ ] 404 & Error Pages
+- [ ] Colors scheme
+  - [ ] Add as varibale
 - [ ] Logbook, Pilots & Aircraft overview & manegement
   - [ ] Logbook Flight Table
-    - [ ] Loading animation (Skeleton ShadCn)
+    - [x] Loading animation (Skeleton ShadCn)
+  - [ ] Rework flight table to fit screen width
   - [ ] Logbook Flight Submit
     - [x] [FIX] Time input button not centered
     - [ ] Calculate time on change
-    - [ ] Tabs orient vertically stacked for mobile devices
 - [ ] Progressive Web App (PWA) (Capacitor?)
 - [ ] Update folder structure
 - [ ] Documentation using [Aria-Docs](https://github.com/nisabmohd/Aria-Docs)
