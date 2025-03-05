@@ -1,11 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { List, Plus, Search, Table } from "lucide-react";
 import Link from "next/link";
 import { FlightList } from "@/components/flight-list/flight-list";
+import { Input } from "@/components/ui/input";
+import { FlightTable } from "@/components/flight-list/flight-table";
+import { columns } from "@/schemas/flight";
 
 // Mock data for demonstration
 const mockFlights = [
@@ -42,38 +45,44 @@ const mockFlights = [
 ];
 
 export default function FlightsPage() {
-  const [searchVisible, setSearchVisible] = useState(false);
-  const [filterVisible, setFilterVisible] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  //   const [activeFilters, setActiveFilters] = useState<FilterOptions>({
-  //     dateRange: "all",
-  //     aircraftTypes: [],
-  //     flightTypes: [],
-  //     airports: [],
-  //   });
+  const [viewMode, setViewMode] = useState<"blocks" | "table">("blocks");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showViewOptions, setShowViewOptions] = useState(false);
+  const [visibleColumns, setVisibleColumns] = useState<string[]>(
+    columns.map((col) => col.key)
+  );
 
-  // Filter flights based on search query and filters
-  const filteredFlights = mockFlights.filter((flight) => {
-    // Search filter
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
+  const [loading, setLoading] = useState(true);
+  const [flights, setFlights] = useState<typeof mockFlights>([]);
+
+  // Simulate loading data
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      // Simulate API call with delay
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      setFlights(mockFlights);
+      setLoading(false);
+    };
+
+    loadData();
+  }, []);
+
+  const filteredFlights = useMemo(() => {
+    if (!searchTerm) return flights; // REPLACE THIS IN THE FUTURE
+
+    const searchTermLower = searchTerm.toLowerCase();
+
+    return flights.filter((flight) => {
       return (
-        flight.departure.toLowerCase().includes(query) ||
-        flight.arrival.toLowerCase().includes(query) ||
-        flight.registration.toLowerCase().includes(query) ||
-        flight.aircraftType.toLowerCase().includes(query)
+        flight.date.toLowerCase().includes(searchTermLower) ||
+        flight.departure.toLowerCase().includes(searchTermLower) ||
+        flight.arrival.toLowerCase().includes(searchTermLower) ||
+        flight.registration.toLowerCase().includes(searchTermLower) ||
+        flight.aircraftType.toLowerCase().includes(searchTermLower)
       );
-    }
-    return true;
-  });
-
-  //   const toggleSearch = () => {
-  //     setSearchVisible(!searchVisible);
-  //     if (!searchVisible) {
-  //       // Reset search query when closing
-  //       setSearchQuery("");
-  //     }
-  //   };
+    });
+  }, [flights, searchTerm]);
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
@@ -91,35 +100,72 @@ export default function FlightsPage() {
       />
 
       {/* Search button or search bar */}
-      {/* {searchVisible ? (
-        <SearchBar
-          value={searchQuery}
-          onChange={setSearchQuery}
-          onClear={() => {
-            setSearchQuery("");
-            setSearchVisible(false);
-          }}
-        />
-      ) : (
-        <SearchButton onClick={() => setSearchVisible(true)} isActive={false} />
-      )} */}
+      <div className="p-4 flex justify-between">
+        <div className="relative w-64">
+          <Input
+            type="text"
+            placeholder="Search"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+            disabled={loading}
+          />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+        </div>
+        <div>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() =>
+              setViewMode(viewMode === "blocks" ? "table" : "blocks")
+            }
+            className="bg-white"
+            disabled={loading}
+          >
+            {viewMode === "blocks" ? (
+              <>
+                <List className="h-4 w-4" />
+              </>
+            ) : (
+              <>
+                <Table className="h-4 w-4" />
+              </>
+            )}
+          </Button>
+        </div>
+      </div>
 
       <div className="flex-1 bg-white">
-        {filteredFlights.length > 0 ? (
-          <FlightList flights={filteredFlights} />
+        {loading || filteredFlights.length > 0 ? (
+          viewMode === "blocks" ? (
+            <FlightList flights={filteredFlights} loading={loading} />
+          ) : (
+            <FlightTable
+              flights={filteredFlights}
+              visibleColumns={visibleColumns}
+              loading={loading}
+            />
+          )
         ) : (
           <div className="text-center text-gray-500 py-8">
-            <p>No flights found.</p>
-            {searchQuery && <p>Try adjusting your search criteria.</p>}
+            <p>
+              {searchTerm ? (
+                <>
+                  No results found for "
+                  <span className="font-medium">{searchTerm}</span>"
+                </>
+              ) : (
+                "No flights recorded yet."
+              )}
+            </p>
+            {!searchTerm && (
+              <p>
+                Add your first flight by clicking the BUTTON NEEDED HERE button.
+              </p>
+            )}
           </div>
         )}
       </div>
-
-      {/* <FilterOverlay
-        isOpen={filterVisible}
-        onClose={() => setFilterVisible(false)}
-        onApply={setActiveFilters}
-      /> */}
     </div>
   );
 }

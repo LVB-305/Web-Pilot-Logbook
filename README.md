@@ -31,6 +31,7 @@ Initial application release.
 - [ ] Colors scheme
   - [ ] Add as varibale
 - [ ] Logbook, Pilots & Aircraft overview & manegement
+  - [ ] Update data schemes
   - [ ] Logbook Flight Table
     - [x] Loading animation (Skeleton ShadCn)
   - [ ] Rework flight table to fit screen width
@@ -39,7 +40,7 @@ Initial application release.
     - [ ] Calculate time on change
 - [ ] Progressive Web App (PWA) (Capacitor?)
 - [ ] Update folder structure
-- [ ] Documentation using [Aria-Docs](https://github.com/nisabmohd/Aria-Docs)
 
 ### Future releases
 - [ ] Offline functionality
+- [ ] Documentation using [Aria-Docs](https://github.com/nisabmohd/Aria-Docs)

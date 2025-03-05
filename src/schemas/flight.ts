@@ -82,3 +82,105 @@ export const FlightLog = z.object({
 });
 
 export type FlightLog = z.infer<typeof FlightLog>;
+
+interface Column {
+  key: keyof FlightLog;
+  label: string;
+  hidden?: boolean;
+  sortable?: boolean;
+  sortType?: "string" | "number" | "date" | "time" | "boolean";
+  width?: string;
+}
+
+export const columns: Column[] = [
+  {
+    key: "date",
+    label: "Date",
+    sortable: true,
+    sortType: "date",
+    width: "120px",
+  },
+  { key: "departure", label: "Departure", width: "120px" },
+  { key: "destination", label: "Destination", width: "120px" },
+  { key: "offBlock", label: "Off Block", width: "100px" },
+  { key: "onBlock", label: "On Block", width: "100px" },
+  {
+    key: "picName",
+    label: "PIC Name",
+    sortable: true,
+    sortType: "string",
+    width: "150px",
+  },
+  { key: "registration", label: "Registration", width: "120px" },
+  {
+    key: "dayTakeOff",
+    label: "Day Take-Off",
+    sortable: true,
+    sortType: "number",
+    width: "120px",
+  },
+  {
+    key: "nightTakeOff",
+    label: "Night Take-Off",
+    sortable: true,
+    sortType: "number",
+    width: "120px",
+  },
+  {
+    key: "dayLanding",
+    label: "Day Landing",
+    sortable: true,
+    sortType: "number",
+    width: "120px",
+  },
+  {
+    key: "nightLanding",
+    label: "Night Landing",
+    sortable: true,
+    sortType: "number",
+    width: "120px",
+  },
+  {
+    key: "totalBlock",
+    label: "Total Block",
+    sortable: true,
+    sortType: "time",
+    width: "120px",
+  },
+  {
+    key: "night",
+    label: "Night",
+    sortable: true,
+    sortType: "time",
+    width: "100px",
+  },
+  {
+    key: "ifr",
+    label: "IFR",
+    sortable: true,
+    sortType: "time",
+    width: "100px",
+  },
+  {
+    key: "pic",
+    label: "PIC",
+    sortable: true,
+    sortType: "time",
+    width: "100px",
+  },
+  {
+    key: "dual",
+    label: "Dual",
+    sortable: true,
+    sortType: "time",
+    width: "100px",
+  },
+  {
+    key: "solo",
+    label: "Solo",
+    sortable: true,
+    sortType: "boolean",
+    width: "100px",
+  },
+  { key: "remark", label: "Remark", width: "200px" },
+];
