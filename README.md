@@ -34,7 +34,9 @@ Initial application release.
   - [ ] Update data schemes
   - [ ] Logbook Flight Table
     - [x] Loading animation (Skeleton ShadCn)
-  - [ ] Rework flight table to fit screen width
+    - [x] FIX date sorting & last date first
+    - [x] Rework flight table to fit screen width
+    - [ ] Simulator flights for flight lists & table
   - [ ] Logbook Flight Submit
     - [x] [FIX] Time input button not centered
     - [ ] Calculate time on change

@@ -1,8 +1,7 @@
 "use server";
-import { NextApiRequest, NextApiResponse } from "next";
 import { google } from "googleapis";
 
-export default async function getFlights() {
+export default async function getFlightLogs() {
   try {
     const auth = await google.auth.getClient({
       //   projectId: process.env.GOOGLE_PROJECT_ID,
@@ -77,5 +76,6 @@ export default async function getFlights() {
     return requests;
   } catch (error) {
     console.error(error);
+    return error;
   }
 }

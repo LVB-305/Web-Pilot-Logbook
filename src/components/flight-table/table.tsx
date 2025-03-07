@@ -27,7 +27,8 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import router from "next/router";
 import { Skeleton } from "@/components/ui/skeleton";
-import getFlights from "@/api/handler";
+import getFlights from "@/hooks/flights";
+import getFlightLogs from "@/hooks/flights";
 
 type SortDirection = "asc" | "desc" | null;
 
@@ -163,7 +164,7 @@ export default function FlightLogTable() {
   async function fetchFlightLogs() {
     try {
       setLoading(true);
-      const response = await getFlights();
+      const response = await getFlightLogs();
 
       setFlightLogs(response);
 
@@ -291,7 +292,7 @@ export default function FlightLogTable() {
         log.destination,
         log.destination_runway
       ).toLowerCase();
-      const aircraft = formatLocation(
+      const aircraft = formatAircraft(
         log.aircraftRegistration,
         log.aircraftType
       ).toLowerCase();
@@ -309,7 +310,7 @@ export default function FlightLogTable() {
         (searchTermLower === "picus" && log.isPicus)
       );
     });
-  }, [flightLogs, searchTerm, formatLocation]);
+  }, [flightLogs, searchTerm, formatLocation, formatAircraft]);
 
   return (
     <ScrollArea className="max-w-full">

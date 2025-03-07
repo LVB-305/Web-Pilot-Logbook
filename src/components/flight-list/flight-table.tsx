@@ -9,8 +9,8 @@ import {
 } from "../ui/table";
 import { ChevronDown, ChevronsUpDown, ChevronUp } from "lucide-react";
 import { Suspense, useCallback, useMemo, useState } from "react";
-import { Badge } from "../ui/badge";
-import { Skeleton } from "../ui/skeleton";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type SortDirection = "asc" | "desc" | null;
 
@@ -25,8 +25,7 @@ export function FlightTable({
   visibleColumns = [],
   loading = false,
 }: FlightTableProps) {
-  // const [flightLogs, setFlightLogs] = useState(flights);
-  const [error, setError] = useState<string | null>(null);
+  // const [error, setError] = useState<string | null>(null);
   const [sorting, setSorting] = useState<{
     column: keyof FlightLog | null;
     direction: SortDirection;
@@ -34,7 +33,6 @@ export function FlightTable({
     column: null,
     direction: null,
   });
-  // const [loading, setLoading] = useState(true); // Add loading state
 
   const activeColumns =
     visibleColumns.length > 0
@@ -70,8 +68,8 @@ export function FlightTable({
             : Number(valueB) - Number(valueA);
         case "date":
           const parseDate = (dateStr: string) => {
-            // Assuming date format is YYYY-MM-DD
-            return new Date(dateStr).getTime();
+            const [day, month, year] = dateStr.split("/").map(Number);
+            return new Date(year, month - 1, day).getTime();
           };
           return sorting.direction === "asc"
             ? parseDate(String(valueA)) - parseDate(String(valueB))
@@ -95,8 +93,12 @@ export function FlightTable({
   }, [flights, sorting.column, sorting.direction]);
 
   const formatLocation = useCallback((location: string, runway?: string) => {
+    // Handle missing airport with runway
+    if (!location && runway) {
+      return `-/${runway}`;
+    }
     // Only add the runway with separator if runway is provided
-    return runway && runway.trim() ? `${location}/${runway}` : location;
+    return runway && runway.trim() ? `${location}/${runway}` : location || "-";
   }, []);
 
   const formatAircraft = useCallback((registration?: string, type?: string) => {
@@ -104,6 +106,10 @@ export function FlightTable({
       return (
         <span className="text-center truncate font-medium">{registration}</span>
       );
+    }
+
+    if (!registration && !type) {
+      return <span>-</span>;
     }
 
     // Both registration and type are available

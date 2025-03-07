@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { List, Plus, Search, Table } from "lucide-react";
@@ -8,78 +8,71 @@ import Link from "next/link";
 import { FlightList } from "@/components/flight-list/flight-list";
 import { Input } from "@/components/ui/input";
 import { FlightTable } from "@/components/flight-list/flight-table";
-import { columns } from "@/schemas/flight";
-
-// Mock data for demonstration
-const mockFlights = [
-  {
-    id: "1",
-    date: "2024-03-29",
-    departure: "EGLL",
-    arrival: "EGLL",
-    startTime: "23:19",
-    endTime: "00:26",
-    registration: "G-AAAA",
-    aircraftType: "B748",
-  },
-  {
-    id: "2",
-    date: "2024-03-29",
-    departure: "EGLL",
-    arrival: "EGLL",
-    startTime: "03:00",
-    endTime: "04:11",
-    registration: "G-AAAA",
-    aircraftType: "B748",
-  },
-  {
-    id: "3",
-    date: "2024-02-15",
-    departure: "KJFK",
-    arrival: "EGLL",
-    startTime: "21:00",
-    endTime: "09:15",
-    registration: "G-BBBB",
-    aircraftType: "A320",
-  },
-];
+import { columns, FlightLog } from "@/schemas/flight";
+import getFlightLogs from "@/hooks/flights";
 
 export default function FlightsPage() {
   const [viewMode, setViewMode] = useState<"blocks" | "table">("blocks");
   const [searchTerm, setSearchTerm] = useState("");
-  const [showViewOptions, setShowViewOptions] = useState(false);
+  // const [showViewOptions, setShowViewOptions] = useState(false);
   const [visibleColumns, setVisibleColumns] = useState<string[]>(
     columns.map((col) => col.key)
   );
 
   const [loading, setLoading] = useState(true);
-  const [flights, setFlights] = useState<typeof mockFlights>([]);
+  const [flights, setFlights] = useState<FlightLog[]>([]);
 
-  // Simulate loading data
+  // TMP
+  const sortLatest = true;
+
+  // Apply default date sorting
+  const applyDefaultSorting = useCallback(
+    (logs: FlightLog[]) => {
+      return [...logs].sort((a, b) => {
+        const parseDate = (date: string) => {
+          const [day, month, year] = date.split("/").map(Number);
+          return new Date(year, month - 1, day).getTime();
+        };
+        if (sortLatest) {
+          return parseDate(b.date) - parseDate(a.date);
+        } else {
+          return parseDate(a.date) - parseDate(b.date);
+        }
+      });
+    },
+    [sortLatest]
+  );
+
+  // Load data from function
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      // Simulate API call with delay
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      setFlights(mockFlights);
+
+      const flights = (await getFlightLogs()) as FlightLog[];
+      setFlights(applyDefaultSorting(flights));
       setLoading(false);
     };
 
     loadData();
-  }, []);
+  }, [applyDefaultSorting]);
 
   const filteredFlights = useMemo(() => {
     if (!searchTerm) return flights; // REPLACE THIS IN THE FUTURE
 
-    const searchTermLower = searchTerm.toLowerCase();
-
     return flights.filter((flight) => {
+      const searchTermLower = searchTerm.toLowerCase();
+      const year = new Date(flight.date).getFullYear().toString();
       return (
         flight.date.toLowerCase().includes(searchTermLower) ||
+        year.includes(searchTermLower) ||
         flight.departure.toLowerCase().includes(searchTermLower) ||
-        flight.arrival.toLowerCase().includes(searchTermLower) ||
-        flight.registration.toLowerCase().includes(searchTermLower) ||
-        flight.aircraftType.toLowerCase().includes(searchTermLower)
+        flight.destination.toLowerCase().includes(searchTermLower) ||
+        flight.aircraftRegistration.toLowerCase().includes(searchTermLower) ||
+        flight.aircraftType.toLowerCase().includes(searchTermLower) ||
+        flight.picName.toLowerCase().includes(searchTermLower) ||
+        (searchTermLower === "solo" && flight.isSolo) ||
+        (searchTermLower === "spic" && flight.isSpic) ||
+        (searchTermLower === "picus" && flight.isPicus)
       );
     });
   }, [flights, searchTerm]);
@@ -138,7 +131,19 @@ export default function FlightsPage() {
       <div className="flex-1 bg-white">
         {loading || filteredFlights.length > 0 ? (
           viewMode === "blocks" ? (
-            <FlightList flights={filteredFlights} loading={loading} />
+            <FlightList
+              flights={filteredFlights.map((f) => ({
+                id: f.id,
+                date: f.date,
+                arrival: f.destination,
+                departure: f.departure,
+                startTime: f.timeOffBlock,
+                endTime: f.timeOnBlock,
+                registration: f.aircraftRegistration,
+                aircraftType: f.aircraftType,
+              }))}
+              loading={loading}
+            />
           ) : (
             <FlightTable
               flights={filteredFlights}
@@ -151,8 +156,8 @@ export default function FlightsPage() {
             <p>
               {searchTerm ? (
                 <>
-                  No results found for "
-                  <span className="font-medium">{searchTerm}</span>"
+                  No results found for &quot;
+                  <span className="font-medium">{searchTerm}</span>&quot;
                 </>
               ) : (
                 "No flights recorded yet."

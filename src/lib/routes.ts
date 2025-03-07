@@ -3,8 +3,10 @@ import {
   BarChartIcon as ChartSpline,
   Code,
   FileBadge,
+  FileText,
   Map,
   Plane,
+  Settings,
   TowerControl,
   Users,
 } from "lucide-react";
@@ -69,6 +71,21 @@ export const navigation: NavSection[] = [
         title: "Qualifications",
         href: "/app/qualifications",
         icon: FileBadge,
+      },
+    ],
+  },
+  {
+    title: "TITLE",
+    items: [
+      {
+        title: "Documentation",
+        href: "/docs",
+        icon: FileText,
+      },
+      {
+        title: "Settings",
+        href: "/app/settings",
+        icon: Settings,
       },
     ],
   },

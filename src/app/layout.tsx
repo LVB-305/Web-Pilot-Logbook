@@ -14,7 +14,7 @@ export default function RootLayout({
       <body className="bg-gray-100">
         <SidebarProvider>
           <AppSidebar />
-          <SidebarInset>{children}</SidebarInset>
+          <SidebarInset className="overflow-auto">{children}</SidebarInset>
         </SidebarProvider>
       </body>
     </html>
