@@ -3,27 +3,42 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
-import { List, Plus, Search, Table } from "lucide-react";
+import { Bolt, List, Plus, Search, Table } from "lucide-react";
 import Link from "next/link";
 import { FlightList } from "@/components/flight-list/flight-list";
 import { Input } from "@/components/ui/input";
 import { FlightTable } from "@/components/flight-list/flight-table";
-import { columns, FlightLog } from "@/schemas/flight";
+import { FlightLog } from "@/schemas/flight";
 import getFlightLogs from "@/hooks/flights";
+import { ViewOptionsOverlay } from "@/components/flight-table/ViewOptionsOverlay";
+import {
+  getVisibleColumnsCookie,
+  setVisibleColumnsCookie,
+  getDefaultVisibleColumns,
+  getSortLatestCookie,
+  setSortLatestCookie,
+} from "@/utils/cookies";
 
 export default function FlightsPage() {
   const [viewMode, setViewMode] = useState<"blocks" | "table">("blocks");
   const [searchTerm, setSearchTerm] = useState("");
-  // const [showViewOptions, setShowViewOptions] = useState(false);
-  const [visibleColumns, setVisibleColumns] = useState<string[]>(
-    columns.map((col) => col.key)
+  const [showViewOptions, setShowViewOptions] = useState(false);
+  const [visibleColumns, setVisibleColumns] = useState<(keyof FlightLog)[]>(
+    () => {
+      const savedColumns = getVisibleColumnsCookie();
+      return savedColumns || getDefaultVisibleColumns();
+    }
   );
 
   const [loading, setLoading] = useState(true);
   const [flights, setFlights] = useState<FlightLog[]>([]);
+  const [sortLatest, setSortLatest] = useState(() => getSortLatestCookie());
 
-  // TMP
-  const sortLatest = true;
+  const handleSortLatestChange = (value: boolean) => {
+    setSortLatest(value);
+    setSortLatestCookie(value);
+    setFlights((prev) => applyDefaultSorting([...prev]));
+  };
 
   // Apply default date sorting
   const applyDefaultSorting = useCallback(
@@ -77,6 +92,16 @@ export default function FlightsPage() {
     });
   }, [flights, searchTerm]);
 
+  const toggleColumn = (columnKey: string) => {
+    setVisibleColumns((prev) => {
+      const newColumns = prev.includes(columnKey as keyof FlightLog)
+        ? prev.filter((key) => key !== columnKey)
+        : [...prev, columnKey as keyof FlightLog];
+      setVisibleColumnsCookie(newColumns);
+      return newColumns;
+    });
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
       <PageHeader
@@ -95,7 +120,7 @@ export default function FlightsPage() {
 
       {/* Search button or search bar */}
       <div className="p-4 flex justify-between">
-        <div className="relative w-64">
+        <div className="relative w-48 md:w-64">
           <Input
             type="text"
             placeholder="Search"
@@ -106,7 +131,18 @@ export default function FlightsPage() {
           />
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
         </div>
-        <div>
+        <div className="space-x-2">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => {
+              setShowViewOptions(true);
+            }}
+            className="bg-white"
+            disabled={loading}
+          >
+            <Bolt className="h-4 w-4" />
+          </Button>
           <Button
             variant="outline"
             size="icon"
@@ -128,6 +164,15 @@ export default function FlightsPage() {
           </Button>
         </div>
       </div>
+
+      <ViewOptionsOverlay
+        isOpen={showViewOptions}
+        onClose={() => setShowViewOptions(false)}
+        visibleColumns={visibleColumns}
+        toggleColumn={toggleColumn}
+        sortLatest={sortLatest}
+        onSortLatestChange={handleSortLatestChange}
+      />
 
       <div className="flex-1 bg-white">
         {loading || filteredFlights.length > 0 ? (

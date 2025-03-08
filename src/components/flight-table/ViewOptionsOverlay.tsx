@@ -6,7 +6,6 @@ import { Switch } from "@/components/ui/switch";
 import { ChevronRight } from "lucide-react";
 import { IOSButton } from "@/components/flight-table/ios-button";
 import { ColumnsOverlay } from "@/components/flight-table/ColumnsOverlay";
-
 import { FlightLog } from "@/schemas/flight";
 
 interface ViewOptionsOverlayProps {
@@ -14,7 +13,8 @@ interface ViewOptionsOverlayProps {
   onClose: () => void;
   visibleColumns: (keyof FlightLog)[];
   toggleColumn: (columnKey: keyof FlightLog) => void;
-  updateColumnOrder: (newOrder: (keyof FlightLog)[]) => void;
+  sortLatest: boolean;
+  onSortLatestChange: (value: boolean) => void;
 }
 
 export function ViewOptionsOverlay({
@@ -22,11 +22,10 @@ export function ViewOptionsOverlay({
   onClose,
   visibleColumns,
   toggleColumn,
-  updateColumnOrder,
+  sortLatest,
+  onSortLatestChange,
 }: ViewOptionsOverlayProps) {
   const [showColumns, setShowColumns] = useState(false);
-  const [showRunwayDesignator, setShowRunwayDesignator] = useState(false);
-  const [sortLatest, setSortLatest] = useState(true);
 
   const handleDone = () => {
     onClose();
@@ -35,7 +34,10 @@ export function ViewOptionsOverlay({
   return (
     <>
       <Dialog open={isOpen && !showColumns} onOpenChange={onClose}>
-        <DialogContent className="w-full h-full sm:w-auto sm:h-auto sm:max-w-[450px] sm:min-h-[500px] md:max-w-[40vw] md:min-h-[60vh] p-0 gap-0 bg-[#f5f5f5] dark:bg-zinc-900 [&>button]:hidden flex flex-col">
+        <DialogContent
+          className="w-full h-full max-w-full sm:min-h-[500px] md:max-w-[40vw] md:max-h-[60vh] p-0 gap-0 bg-[#f5f5f5] dark:bg-zinc-900 [&>button]:hidden flex flex-col"
+          aria-describedby={undefined}
+        >
           <div className="flex items-center justify-between p-4 border-b">
             <div className="w-[60px]" /> {/* Spacer for alignment */}
             <DialogTitle>
@@ -61,25 +63,15 @@ export function ViewOptionsOverlay({
             </button>
             <div className="flex items-center justify-between p-4">
               <div className="pr-5">
-                <div className="font-medium">Show Runway Designator</div>
+                <div className="font-medium">Latest Flight First</div>
                 <div className="text-sm text-gray-500 dark:text-gray-400">
-                  Show runway designator with departure and destination
-                  aerodromes
+                  Sort your flights by latest date first
                 </div>
               </div>
               <Switch
-                checked={showRunwayDesignator}
-                onCheckedChange={setShowRunwayDesignator}
+                checked={sortLatest}
+                onCheckedChange={onSortLatestChange}
               />
-            </div>
-            <div className="flex items-center justify-between p-4">
-              <div className="pr-5">
-                <div className="font-medium">Lastest Flight First</div>
-                <div className="text-sm text-gray-500 dark:text-gray-400">
-                  Sort your latest flight first
-                </div>
-              </div>
-              <Switch checked={sortLatest} onCheckedChange={setShowColumns} />
             </div>
           </div>
         </DialogContent>
@@ -90,7 +82,6 @@ export function ViewOptionsOverlay({
         onClose={() => setShowColumns(false)}
         visibleColumns={visibleColumns}
         toggleColumn={toggleColumn}
-        updateColumnOrder={updateColumnOrder}
       />
     </>
   );

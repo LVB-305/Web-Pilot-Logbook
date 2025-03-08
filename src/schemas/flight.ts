@@ -86,7 +86,7 @@ export type FlightLog = z.infer<typeof FlightLog>;
 interface Column {
   key: keyof FlightLog;
   label: string;
-  hidden?: boolean;
+  hiddenByDefault?: boolean;
   sortable?: boolean;
   sortType?: "string" | "number" | "date" | "time" | "boolean";
   width?: string;
@@ -104,8 +104,18 @@ export const columns: Column[] = [
   { key: "destination", label: "Destination", width: "120px" },
   { key: "timeOffBlock", label: "Off Block", width: "100px" },
   { key: "timeOnBlock", label: "On Block", width: "100px" },
-  { key: "timeTakeOff", label: "Take-off Time", width: "100px" },
-  { key: "timeLanding", label: "Landing Time", width: "100px" },
+  {
+    key: "timeTakeOff",
+    label: "Take-off Time",
+    width: "100px",
+    hiddenByDefault: true,
+  },
+  {
+    key: "timeLanding",
+    label: "Landing Time",
+    width: "100px",
+    hiddenByDefault: true,
+  },
   {
     key: "picName",
     label: "PIC Name",

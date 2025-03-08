@@ -28,15 +28,15 @@ Development roadmap to keep track of version feature developments.
 Initial application release.
 - [x] Side navigation & mobile navigtion
 - [ ] 404 & Error Pages
-- [ ] Colors scheme
-  - [ ] Add as varibale
+- [ ] Colors scheme add as variable
+- [ ] Sticky header
 - [ ] Logbook, Pilots & Aircraft overview & manegement
   - [ ] Update data schemes
   - [ ] Logbook Flight Table
     - [x] Loading animation (Skeleton ShadCn)
     - [x] FIX date sorting & last date first
     - [x] Rework flight table to fit screen width
-    - [ ] Column visibility
+    - [x] Column visibility && save column visibility with cookie
     - [ ] Simulator flights for flight lists & table
   - [ ] Logbook Flight Submit
     - [x] [FIX] Time input button not centered

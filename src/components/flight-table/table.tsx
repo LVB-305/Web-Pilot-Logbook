@@ -353,7 +353,7 @@ export default function FlightLogTable() {
             onClose={() => setShowViewOptions(false)}
             visibleColumns={visibleColumns}
             toggleColumn={toggleColumn}
-            updateColumnOrder={updateColumnOrder}
+            // updateColumnOrder={updateColumnOrder}
           />
         </div>
         {error && (
