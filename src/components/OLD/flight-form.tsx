@@ -14,10 +14,10 @@ import {
 import { flightSchema } from "@/schemas/flight";
 import { useRouter } from "next/navigation";
 import { NewFlightLogbook } from "./flight-form/new-flight-log";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import { ArrowLeftIcon, ArrowRightIcon, X } from "lucide-react";
-import { Textarea } from "./ui/textarea";
-import { Checkbox } from "./ui/checkbox";
+import { Textarea } from "../ui/textarea";
+import { Checkbox } from "../ui/checkbox";
 
 // TEMP
 const aircraftTypes = [

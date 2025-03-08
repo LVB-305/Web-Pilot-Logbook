@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { ChevronLeft } from "lucide-react";
-import { IOSButton } from "@/components/flight-table/ios-button";
+import { IOSButton } from "@/components/flight-logs/overlays/ios-button";
 import { FlightLog, columns } from "@/schemas/flight";
 
 interface ColumnsOverlayProps {

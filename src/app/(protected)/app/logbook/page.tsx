@@ -1,4 +1,4 @@
-import Table from "@/components/flight-table/table";
+import FlightsPage from "@/components/flight-logs/flights";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
@@ -6,7 +6,7 @@ import Link from "next/link";
 
 export default function LogbookPage() {
   return (
-    <div>
+    <div className="flex flex-col min-h-screen bg-gray-50">
       <PageHeader
         title="Logbook"
         backHref="/"
@@ -20,7 +20,7 @@ export default function LogbookPage() {
           </Button>
         }
       />
-      <Table />
+      <FlightsPage />
     </div>
   );
 }

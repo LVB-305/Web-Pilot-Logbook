@@ -1,4 +1,6 @@
 import { columns, FlightLog } from "@/schemas/flight";
+import { ChevronDown, ChevronsUpDown, ChevronUp } from "lucide-react";
+import { Suspense, useCallback, useMemo, useState } from "react";
 import {
   Table,
   TableBody,
@@ -6,9 +8,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "../ui/table";
-import { ChevronDown, ChevronsUpDown, ChevronUp } from "lucide-react";
-import { Suspense, useCallback, useMemo, useState } from "react";
+} from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 

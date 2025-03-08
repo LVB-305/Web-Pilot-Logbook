@@ -2,7 +2,7 @@
 
 import "@/styles/globals.css";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/app-sidebar";
+import { AppSidebar } from "@/components/nav/app-sidebar";
 
 export default function RootLayout({
   children,
