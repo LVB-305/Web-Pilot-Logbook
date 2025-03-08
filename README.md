@@ -41,7 +41,7 @@ Initial application release.
   - [ ] Logbook Flight Submit
     - [x] [FIX] Time input button not centered
     - [ ] Calculate time on change
-- [ ] Totals page
+  - [ ] Totals page
 - [ ] Progressive Web App (PWA) (Capacitor?)
 - [ ] Update folder structure
 

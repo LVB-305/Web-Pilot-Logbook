@@ -112,7 +112,7 @@ export default function FlightsPage() {
         actionButton={
           <Button variant="ghost" className="text-blue-600 font-medium" asChild>
             <Link href="/app/logbook/new">
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4" />
             </Link>
           </Button>
         }

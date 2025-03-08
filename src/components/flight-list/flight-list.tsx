@@ -142,7 +142,7 @@ export function FlightList({ flights, loading = false }: FlightListProps) {
                     <button
                       key={flight.id}
                       className="w-full group hover:bg-gray-50 focus:outline-none focus:bg-gray-50"
-                      onClick={() => router.push(`/flights/${flight.id}`)}
+                      onClick={() => router.push(`/app/logbook/${flight.id}`)}
                     >
                       <div className="flex px-4 py-3 relative text-left">
                         {/* Blue vertical line */}

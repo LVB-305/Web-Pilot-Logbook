@@ -446,7 +446,7 @@ export default function FlightForm({
             <FormField
               label="Duty type"
               value={initialData.dutyType}
-              icon={<ChevronDown className="h-5 w-5 text-orange-500" />}
+              icon={<ChevronDown className="h-5 w-5 text-blue-600" />}
             />
           )}
 
@@ -471,7 +471,7 @@ export default function FlightForm({
                 getDisplayText(mockRegistrations, registration) ??
                 "Select registration"
               }
-              icon={<Plane className="h-5 w-5 text-orange-500" />}
+              icon={<Plane className="h-5 w-5 text-blue-600" />}
               onClick={() => setRegistrationDialogOpen(true)}
               className="cursor-pointer"
             />
@@ -481,7 +481,7 @@ export default function FlightForm({
             <FormField
               label="Departure"
               value={getDisplayText(mockAirports, departure) ?? "Add departure"}
-              icon={<PlaneTakeoff className="h-5 w-5 text-orange-500" />}
+              icon={<PlaneTakeoff className="h-5 w-5 text-blue-600" />}
               onClick={() => setDepartureDialogOpen(true)}
               className="cursor-pointer"
             />
@@ -491,7 +491,7 @@ export default function FlightForm({
             <FormField
               label="Arrival"
               value={getDisplayText(mockAirports, arrival) ?? "Add arrival"}
-              icon={<PlaneLanding className="h-5 w-5 text-orange-500" />}
+              icon={<PlaneLanding className="h-5 w-5 text-blue-600" />}
               onClick={() => setArrivalDialogOpen(true)}
               className="cursor-pointer"
             />
@@ -514,7 +514,7 @@ export default function FlightForm({
                       ?.label
                   : "Select PIC"
               }
-              icon={<User className="h-5 w-5 text-orange-500" />}
+              icon={<User className="h-5 w-5 text-blue-600" />}
               onClick={() => setPicDialogOpen(true)}
               className="cursor-pointer"
             />
@@ -623,7 +623,7 @@ export default function FlightForm({
             <div className="px-4 py-3">
               <Button
                 variant="ghost"
-                className="text-orange-500"
+                className="text-blue-600"
                 onClick={() => setApproachDialogOpen(true)}
               >
                 <Plus className="h-4 w-4 mr-2" />
