@@ -10,13 +10,10 @@ export default function LogbookPage() {
       <PageHeader
         title="Logbook"
         backHref="/"
-        showBackButton={false}
+        showBackButton={true}
+        isTopLevelPage={true}
         actionButton={
-          <Button
-            variant="ghost"
-            className="text-orange-500 font-medium"
-            asChild
-          >
+          <Button variant="ghost" className="text-blue-600 font-medium" asChild>
             <Link href="/app/logbook/new">
               <Plus className="h-4 w-4 mr-2" />
             </Link>

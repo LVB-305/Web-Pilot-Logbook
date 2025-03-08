@@ -11,6 +11,7 @@ interface PageHeaderProps {
   title: string;
   backHref?: string;
   showBackButton?: boolean;
+  isTopLevelPage?: boolean;
   onBackClick?: () => void;
   actionButton?: React.ReactNode;
 }
@@ -19,6 +20,7 @@ export function PageHeader({
   title,
   backHref = "/app/logbook",
   showBackButton = true,
+  isTopLevelPage = false,
   onBackClick,
   actionButton,
 }: PageHeaderProps) {
@@ -53,8 +55,8 @@ export function PageHeader({
   return (
     <>
       <header className="flex items-center justify-between p-4 border-b">
-        {showBackButton &&
-          (isMobile ? (
+        {showBackButton ? (
+          isMobile ? (
             <Button
               variant="ghost"
               size="icon"
@@ -63,6 +65,9 @@ export function PageHeader({
             >
               <Menu className="h-6 w-6" />
             </Button>
+          ) : isTopLevelPage ? (
+            // Spacer for top level pages with no return
+            <div className="w-10" />
           ) : backHref ? (
             <Button
               variant="ghost"
@@ -83,7 +88,11 @@ export function PageHeader({
             >
               <ChevronLeft className="h-6 w-6" />
             </Button>
-          ))}
+          )
+        ) : (
+          // Spacer for no return
+          <div className="w-10" />
+        )}
         {!showBackButton && <div className="w-10" />}{" "}
         {/* Spacer when no back button */}
         <h1 className="text-xl font-medium">{title}</h1>

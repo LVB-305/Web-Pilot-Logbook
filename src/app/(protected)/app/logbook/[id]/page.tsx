@@ -1,5 +1,4 @@
 import FlightForm from "@/components/flight-form/flight-form";
-import { PageHeader } from "@/components/page-header";
 
 // Mock data for demonstration
 const mockFlight = {

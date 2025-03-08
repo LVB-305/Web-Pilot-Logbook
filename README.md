@@ -36,10 +36,12 @@ Initial application release.
     - [x] Loading animation (Skeleton ShadCn)
     - [x] FIX date sorting & last date first
     - [x] Rework flight table to fit screen width
+    - [ ] Column visibility
     - [ ] Simulator flights for flight lists & table
   - [ ] Logbook Flight Submit
     - [x] [FIX] Time input button not centered
     - [ ] Calculate time on change
+- [ ] Totals page
 - [ ] Progressive Web App (PWA) (Capacitor?)
 - [ ] Update folder structure
 

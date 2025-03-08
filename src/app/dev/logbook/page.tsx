@@ -83,6 +83,7 @@ export default function FlightsPage() {
         title="Dev"
         backHref="/app/logbook"
         showBackButton={true}
+        isTopLevelPage={true}
         actionButton={
           <Button variant="ghost" className="text-blue-600 font-medium" asChild>
             <Link href="/app/logbook/new">

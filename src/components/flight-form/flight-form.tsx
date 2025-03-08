@@ -413,26 +413,6 @@ export default function FlightForm({
   return (
     <div className="flex flex-col min-h-screen">
       {/* Header */}
-      {/* Split up in components
-      <header className="sticky top-0 z-50 flex items-center justify-between p-4 border-b bg-white">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="text-orange-500"
-          onClick={() => router.back()}
-        >
-          <ChevronLeft className="w-6 h-6" />
-        </Button>
-        <h2>Header To be placed</h2>
-        <Button
-          variant="ghost"
-          className="text-orange-500 font-medium"
-          onClick={handleSubmit}
-        >
-          Save
-        </Button>
-      </header> */}
-
       <PageHeader
         title={mode === "new" ? "New Flight" : "Edit Flight"}
         backHref="/app/logbook"
@@ -440,7 +420,7 @@ export default function FlightForm({
         actionButton={
           <Button
             variant="ghost"
-            className="text-orange-500 font-medium"
+            className="text-blue-600 font-medium"
             onClick={handleSubmit}
           >
             Save
