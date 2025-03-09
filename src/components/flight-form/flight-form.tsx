@@ -1,8 +1,8 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 import {
   ChevronDown,
-  ChevronLeft,
   Clock,
   PenTool,
   Plane,
@@ -117,6 +117,7 @@ interface FlightData {
     date: string;
     name: string;
     licenseNumber: string;
+    data?: string;
   } | null;
 }
 
@@ -524,7 +525,6 @@ export default function FlightForm({
         {/* Takeoffs / Landings Section */}
         <FormSection
           title="Takeoffs / Landings"
-          showEditFields
           collapsible={true}
           defaultOpen={true}
           onEditFields={() => setEditingSection("takeoffsLandings")}
@@ -791,7 +791,11 @@ export default function FlightForm({
                   </div>
                   <div className="flex items-center gap-4">
                     <TimeInput
-                      value={value.start}
+                      value={
+                        typeof value.start === "number"
+                          ? value.start.toString()
+                          : value.start
+                      }
                       onChange={(newValue) =>
                         handleTimeChange(
                           key as keyof typeof times,
@@ -802,7 +806,11 @@ export default function FlightForm({
                       className="w-16"
                     />
                     <TimeInput
-                      value={value.end}
+                      value={
+                        typeof value.end === "number"
+                          ? value.end.toString()
+                          : value.end
+                      }
                       onChange={(newValue) =>
                         handleTimeChange(
                           key as keyof typeof times,
@@ -812,7 +820,10 @@ export default function FlightForm({
                       }
                       className="w-16"
                     />
-                    <div className="w-16 text-center text-gray-600">##:##</div>
+                    <div className="w-16 text-center text-gray-600">
+                      {/* {Number(value.end) - Number(value.start)} */}
+                      ##:##
+                    </div>
                   </div>
                 </div>
               );
@@ -837,10 +848,10 @@ export default function FlightForm({
                 <div className="flex-1">
                   <TimeInput
                     value={value}
-                    onChange={(e) =>
+                    onChange={() =>
                       handleDurationChange(
                         key as keyof typeof durations,
-                        e.target.value
+                        value
                         // FIX DURATIONS AS TIME
                       )
                     }
@@ -926,13 +937,15 @@ export default function FlightForm({
                       >
                         Change
                       </Button>
-                    </div>
-                    <div className="border rounded-md p-2">
-                      <img
-                        src={signature.data || "/placeholder.svg"}
-                        alt="Signature"
-                        className="max-h-20 w-auto mx-auto"
-                      />
+                      <div className="border rounded-md p-2">
+                        <Image
+                          src={signature.data || "/placeholder.svg"}
+                          alt="Signature"
+                          width={200}
+                          height={80}
+                          className="h-20 w-auto mx-auto object-contain"
+                        />
+                      </div>
                     </div>
                   </div>
                 ) : (

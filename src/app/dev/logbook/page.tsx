@@ -1,14 +1,16 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Bolt, List, Search, Table } from "lucide-react";
-import { FlightLog } from "@/schemas/flight";
-import getFlightLogs from "@/hooks/flights/get-flight";
+import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
-import { ViewOptionsOverlay } from "@/components/flight-logs/overlays/ViewOptionsOverlay";
+import { Bolt, List, Plus, Search, Table } from "lucide-react";
+import Link from "next/link";
 import { FlightList } from "@/components/flight-logs/flight-list";
 import { Input } from "@/components/ui/input";
 import { FlightTable } from "@/components/flight-logs/flight-table";
+import { FlightLog } from "@/schemas/flight";
+import getFlightLogs from "@/hooks/flights/get-flight";
+import { ViewOptionsOverlay } from "@/components/flight-logs/overlays/ViewOptionsOverlay";
 import {
   getVisibleColumnsCookie,
   setVisibleColumnsCookie,
@@ -101,7 +103,21 @@ export default function FlightsPage() {
   };
 
   return (
-    <div>
+    <div className="flex flex-col min-h-screen bg-gray-50">
+      <PageHeader
+        title="Dev"
+        backHref="/app/logbook"
+        showBackButton={true}
+        isTopLevelPage={true}
+        actionButton={
+          <Button variant="ghost" className="text-blue-600 font-medium" asChild>
+            <Link href="/app/logbook/new">
+              <Plus className="h-4 w-4" />
+            </Link>
+          </Button>
+        }
+      />
+
       {/* Search button or search bar */}
       <div className="p-4 flex justify-between">
         <div className="relative w-48 md:w-64">
