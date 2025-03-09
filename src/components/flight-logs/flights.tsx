@@ -162,15 +162,19 @@ export default function FlightsPage() {
         {loading || filteredFlights.length > 0 ? (
           viewMode === "blocks" ? (
             <FlightList
-              flights={filteredFlights.map((f) => ({
-                id: f.id,
-                date: f.date,
-                arrival: f.destination,
-                departure: f.departure,
-                startTime: f.timeOffBlock,
-                endTime: f.timeOnBlock,
-                registration: f.aircraftRegistration,
-                aircraftType: f.aircraftType,
+              flights={filteredFlights.map((flight) => ({
+                id: flight.id,
+                date: flight.date,
+                arrival: flight.destination,
+                departure: flight.departure,
+                startTime: flight.timeOffBlock,
+                endTime: flight.timeOnBlock,
+                flightTime: flight.totalBlockTime,
+                registration: flight.aircraftRegistration,
+                aircraftType: flight.aircraftType,
+                isSimulator: Boolean(flight.simulatorType),
+                simulatorType: flight.simulatorType,
+                simulatorTime: flight.timeSimulator,
               }))}
               loading={loading}
             />

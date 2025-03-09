@@ -13,8 +13,12 @@ interface Flight {
   arrival: string;
   startTime: string;
   endTime: string;
+  flightTime: string;
   registration: string;
   aircraftType: string;
+  isSimulator: boolean;
+  simulatorType?: string;
+  simulatorTime?: string;
 }
 
 interface FlightGrouping {
@@ -50,23 +54,23 @@ function groupFlightsByMonth(flights: Flight[]): FlightGrouping[] {
 }
 
 // Calculate flight duration in hours and minutes
-function calculateFlightDuration(startTime: string, endTime: string): string {
-  const [startHours, startMinutes] = startTime.split(":").map(Number);
-  const [endHours, endMinutes] = endTime.split(":").map(Number);
+// function calculateFlightDuration(startTime: string, endTime: string): string {
+//   const [startHours, startMinutes] = startTime.split(":").map(Number);
+//   const [endHours, endMinutes] = endTime.split(":").map(Number);
 
-  let durationMinutes =
-    endHours * 60 + endMinutes - (startHours * 60 + startMinutes);
+//   let durationMinutes =
+//     endHours * 60 + endMinutes - (startHours * 60 + startMinutes);
 
-  // Handle flights that cross midnight
-  if (durationMinutes < 0) {
-    durationMinutes += 24 * 60;
-  }
+//   // Handle flights that cross midnight
+//   if (durationMinutes < 0) {
+//     durationMinutes += 24 * 60;
+//   }
 
-  const hours = Math.floor(durationMinutes / 60);
-  const minutes = durationMinutes % 60;
+//   const hours = Math.floor(durationMinutes / 60);
+//   const minutes = durationMinutes % 60;
 
-  return `${hours}h ${minutes}m`;
-}
+//   return `${hours}h ${minutes}m`;
+// }
 
 export function FlightList({ flights, loading = false }: FlightListProps) {
   const router = useRouter();
@@ -146,55 +150,76 @@ export function FlightList({ flights, loading = false }: FlightListProps) {
                     >
                       <div className="flex px-4 py-3 relative text-left">
                         {/* Blue vertical line */}
-                        <div className="absolute left-0 top-2 bottom-2 w-1.5 rounded-sm bg-blue-600" />
+                        <div
+                          className={`absolute left-0 top-2 bottom-2 w-1.5 rounded-sm ${
+                            flight.isSimulator ? "bg-red-600" : "bg-blue-600"
+                          }`}
+                        />
 
                         {/* Main content with left alignment */}
                         <div className="flex justify-between w-full">
-                          {/* Left section: Date, Route, Time - all aligned to the same left position */}
+                          {/* Left section: Date, Route/Simulator, Time - all aligned to the same left position */}
                           <div className="pl-3">
                             {/* Date */}
                             <div className="text-gray-500 text-sm">
                               {format(new Date(date), "dd MMM yyyy")}
                             </div>
 
-                            {/* Route */}
+                            {/* Route or Simulator type */}
                             <div className="text-black font-bold text-base mt-1">
-                              {flight.departure}{" "}
-                              <span className="inline-block transform translate-y-[-2px] font-extrabold">
-                                →
-                              </span>{" "}
-                              {flight.arrival}
+                              {flight.isSimulator ? (
+                                <span className="text-black">
+                                  {flight.simulatorType || "Unkown"}
+                                </span>
+                              ) : (
+                                <>
+                                  {flight.departure}{" "}
+                                  <span className="inline-block transform translate-y-[-2px] font-extrabold">
+                                    →
+                                  </span>{" "}
+                                  {flight.arrival}
+                                </>
+                              )}
                             </div>
 
                             {/* Time */}
-                            <div className="text-sm text-gray-900 mt-1">
-                              {flight.startTime}{" "}
-                              <span className="inline-block transform translate-y-[-1px]">
-                                -
-                              </span>{" "}
-                              {flight.endTime}
-                            </div>
+                            {(!flight.isSimulator ||
+                              (flight.startTime && flight.endTime)) && (
+                              <div className="text-sm text-gray-900 mt-1">
+                                {flight.startTime}{" "}
+                                <span className="inline-block transform translate-y-[-1px]">
+                                  -
+                                </span>{" "}
+                                {flight.endTime}
+                              </div>
+                            )}
                           </div>
                         </div>
 
                         <div className="absolute right-12 top-1/2 -translate-y-1/2 flex flex-col items-end">
                           {/* Right section: Flight time and Registration */}
-                          <div className="text-sm text-gray-900">
-                            {calculateFlightDuration(
-                              flight.startTime,
-                              flight.endTime
-                            )}
-                          </div>
-
-                          {flight.registration || flight.aircraftType ? (
-                            /* Registration (moved below flight time) */
-                            <div className="flex items-center text-blue-600 mt-1">
-                              <span className="text-sm font-medium">
-                                {flight.registration} ({flight.aircraftType})
-                              </span>
+                          {flight.isSimulator ? (
+                            <div className="text-sm text-gray-900">
+                              {flight.simulatorTime}
                             </div>
                           ) : (
-                            <div className="text-sm text-gray-500 mt-1">-</div>
+                            flight.startTime &&
+                            flight.endTime && (
+                              <div className="text-sm text-gray-900">
+                                {flight.flightTime}
+                              </div>
+                            )
+                          )}
+
+                          {(flight.registration ||
+                            (flight.aircraftType && !flight.isSimulator)) && (
+                            <div className="flex items-center text-blue-600 mt-1">
+                              {flight.registration && (
+                                <span className="text-sm font-medium">
+                                  {flight.registration} ({flight.aircraftType})
+                                </span>
+                              )}
+                            </div>
                           )}
                         </div>
 

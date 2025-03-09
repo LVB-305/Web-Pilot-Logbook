@@ -37,7 +37,7 @@ Initial application release.
     - [x] FIX date sorting & last date first
     - [x] Rework flight table to fit screen width
     - [x] Column visibility && save column visibility with cookie
-    - [ ] Simulator flights for flight lists & table
+    - [x] Simulator flights for flight lists & table
   - [ ] Logbook Flight Submit
     - [x] [FIX] Time input button not centered
     - [ ] Calculate time on change
