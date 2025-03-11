@@ -39,7 +39,7 @@ Initial application release.
     - [x] Column visibility && save column visibility with cookie
     - [x] Simulator flights for flight lists & table
   - [ ] Logbook Flight Submit
-    - [x] [FIX] Time input button not centered
+    - [ ] Modular form
     - [ ] Calculate time on change
   - [ ] Totals page
 - [ ] Progressive Web App (PWA) (Capacitor?)
