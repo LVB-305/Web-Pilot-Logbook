@@ -1,22 +1,31 @@
-"use client";
+import { siteConfig } from "@/config/site";
 
-import "@/styles/globals.css";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/nav/app-sidebar";
+export const metadata = {
+  metadataBase: new URL(siteConfig.url.base),
+  title: {
+    default: siteConfig.name,
+    template: `%s | ${siteConfig.name}`,
+  },
+  description: siteConfig.description,
+  keywords: siteConfig.keywords,
+  authors: [
+    {
+      name: siteConfig.author,
+      url: siteConfig.url.author,
+    },
+  ],
+  creator: siteConfig.author,
+  icons: {
+    icon: "/favicon.ico",
+  },
+};
 
 export default function RootLayout({
   children,
-}: {
-  children: React.ReactNode;
-}) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className="bg-gray-100">
-        <SidebarProvider>
-          <AppSidebar />
-          <SidebarInset className="overflow-auto">{children}</SidebarInset>
-        </SidebarProvider>
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

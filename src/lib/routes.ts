@@ -49,7 +49,7 @@ export const navigation: NavSection[] = [
       },
       {
         title: "Dev: Logbook Table",
-        href: "/dev",
+        href: "/app/dev",
         icon: Code,
       },
     ],
