@@ -10,12 +10,7 @@ interface NumberInputProps {
   className?: string;
 }
 
-export function NumberInput({
-  value,
-  onChange,
-  min = 0,
-  className,
-}: NumberInputProps) {
+export function NumberInput({ value, onChange, min = 0 }: NumberInputProps) {
   const handleIncrement = () => onChange(value + 1);
   const handleDecrement = () => {
     if (value > min) {
@@ -28,7 +23,7 @@ export function NumberInput({
       <Button
         variant="ghost"
         size="icon"
-        className="h-8 w-8 text-orange-500"
+        className="h-8 w-8 text-blue-600"
         onClick={handleDecrement}
       >
         <Minus className="h-4 w-4" />
@@ -47,7 +42,7 @@ export function NumberInput({
       <Button
         variant="ghost"
         size="icon"
-        className="h-8 w-8 text-orange-500"
+        className="h-8 w-8 text-blue-600"
         onClick={handleIncrement}
       >
         <Plus className="h-4 w-4" />

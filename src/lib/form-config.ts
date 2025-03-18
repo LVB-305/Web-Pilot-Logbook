@@ -64,12 +64,12 @@ export const flightFormConfig: FormSection[] = [
         ],
         required: true,
       },
-      {
-        id: "flightNumber",
-        title: "Flight #",
-        type: "text",
-        placeholder: "Enter flight number",
-      },
+      // {
+      //   id: "flightNumber",
+      //   title: "Flight #",
+      //   type: "text",
+      //   placeholder: "Enter flight number",
+      // },
       {
         id: "registration",
         title: "Registration",
@@ -96,11 +96,11 @@ export const flightFormConfig: FormSection[] = [
     collapsible: true,
     defaultOpen: true,
     fields: [
-      {
-        id: "pilotFlying",
-        title: "Pilot Flying",
-        type: "toggle",
-      },
+      // {
+      //   id: "pilotFlying",
+      //   title: "Pilot Flying",
+      //   type: "toggle",
+      // },
       {
         id: "takeoffsLandings",
         title: "Takeoffs and Landings",
@@ -118,7 +118,76 @@ export const flightFormConfig: FormSection[] = [
         id: "pic",
         title: "PIC",
         type: "select",
-        placeholder: "Select PIC...",
+        placeholder: "Select Crew",
+      },
+    ],
+  },
+  {
+    id: "times",
+    title: "Times",
+    collapsible: true,
+    defaultOpen: true,
+    fields: [
+      {
+        id: "timeRanges",
+        title: "Time Ranges",
+        type: "timeRanges",
+      },
+    ],
+  },
+  {
+    id: "timeDurations",
+    title: "Time Durations",
+    collapsible: true,
+    defaultOpen: true,
+    fields: [
+      // {
+      //   id: "totalTime",
+      //   title: "Total Time",
+      //   type: "time",
+      //   placeholder: "##:##",
+      // },
+      {
+        id: "ifrTime",
+        title: "IFR Time",
+        type: "time",
+        placeholder: "##:##",
+      },
+      {
+        id: "nightTime",
+        title: "Night Time",
+        type: "time",
+        placeholder: "##:##",
+      },
+      {
+        id: "xcTime",
+        title: "Cross-Country Time",
+        type: "time",
+        placeholder: "##:##",
+      },
+      {
+        id: "picTime",
+        title: "PIC Time",
+        type: "time",
+        placeholder: "##:##",
+      },
+      {
+        id: "copilotTime",
+        title: "Co-pilot Time",
+        type: "time",
+        placeholder: "##:##",
+      },
+      {
+        id: "dualTime",
+        title: "Dual Time",
+        type: "time",
+        placeholder: "##:##",
+      },
+      {
+        id: "instructorTime",
+        title: "Instructor Time",
+        type: "time",
+        placeholder: "##:##",
       },
     ],
   },
@@ -142,82 +211,9 @@ export const flightFormConfig: FormSection[] = [
     defaultOpen: true,
     fields: [
       {
-        id: "autolands",
-        title: "Autolands",
+        id: "passengers",
+        title: "Passengers",
         type: "number",
-      },
-      {
-        id: "dailyAllowance",
-        title: "Daily Allowance",
-        type: "text",
-        placeholder: "Enter amount",
-      },
-      {
-        id: "flightPay",
-        title: "Flight Pay",
-        type: "text",
-        placeholder: "Enter amount",
-      },
-      {
-        id: "fuel",
-        title: "Fuel",
-        type: "text",
-        placeholder: "Enter amount",
-      },
-      {
-        id: "goArounds",
-        title: "Go Arounds",
-        type: "number",
-      },
-      {
-        id: "outOfBase",
-        title: "Out of Base",
-        type: "toggle",
-      },
-    ],
-  },
-  {
-    id: "times",
-    title: "Times",
-    collapsible: true,
-    defaultOpen: true,
-    fields: [
-      {
-        id: "timeRanges",
-        title: "Time Ranges",
-        type: "timeRanges",
-      },
-    ],
-  },
-  {
-    id: "timeDurations",
-    title: "Time Durations",
-    collapsible: true,
-    defaultOpen: true,
-    fields: [
-      {
-        id: "totalTime",
-        title: "Total Time",
-        type: "time",
-        placeholder: "##:##",
-      },
-      {
-        id: "actualInstrument",
-        title: "Actual Instrument",
-        type: "time",
-        placeholder: "##:##",
-      },
-      {
-        id: "dualGiven",
-        title: "Dual Given",
-        type: "time",
-        placeholder: "##:##",
-      },
-      {
-        id: "dualReceived",
-        title: "Dual Received",
-        type: "time",
-        placeholder: "##:##",
       },
     ],
   },

@@ -10,29 +10,24 @@ export interface FlightData {
   registration: string;
   departure: string;
   destination: string;
-  isPilotFlying: boolean;
+  // isPilotFlying: boolean;
   dayTakeoffs: number;
   nightTakeoffs: number;
   dayLandings: number;
   nightLandings: number;
-  autolands: number;
-  goArounds: number;
-  isOutOfBase: boolean;
   pic: string;
   approaches: Array<{ id: string; count: number }>;
   times: {
-    scheduled: TimeRange;
-    duty: TimeRange;
     block: TimeRange;
     flight: TimeRange;
     hobbs: {
       start: number;
       end: number;
     };
-    tach: {
-      start: number;
-      end: number;
-    };
+    // tach: {
+    //   start: number;
+    //   end: number;
+    // };
   };
   durations: {
     totalTime: string;
@@ -40,11 +35,7 @@ export interface FlightData {
     dualGiven: string;
     dualReceived: string;
   };
-  otherItems: {
-    dailyAllowance: string;
-    flightPay: string;
-    fuel: string;
-  };
+  passengers: number;
   remarks: {
     general: string;
     training: string;
@@ -63,23 +54,18 @@ export const defaultFlightData: FlightData = {
   registration: "",
   departure: "",
   destination: "",
-  isPilotFlying: false,
+  // isPilotFlying: false,
   dayTakeoffs: 0,
   nightTakeoffs: 0,
   dayLandings: 0,
   nightLandings: 0,
-  autolands: 0,
-  goArounds: 0,
-  isOutOfBase: false,
   pic: "",
   approaches: [],
   times: {
-    scheduled: { start: "", end: "" },
-    duty: { start: "", end: "" },
     block: { start: "", end: "" },
     flight: { start: "", end: "" },
     hobbs: { start: 0, end: 0 },
-    tach: { start: 0, end: 0 },
+    // tach: { start: 0, end: 0 },
   },
   durations: {
     totalTime: "",
@@ -87,11 +73,7 @@ export const defaultFlightData: FlightData = {
     dualGiven: "",
     dualReceived: "",
   },
-  otherItems: {
-    dailyAllowance: "",
-    flightPay: "",
-    fuel: "",
-  },
+  passengers: 0,
   remarks: {
     general: "",
     training: "",

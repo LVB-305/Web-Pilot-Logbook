@@ -3,11 +3,8 @@
 import { useState } from "react";
 import { FormField as FormFieldComponent } from "@/components/flight-form/form-field";
 import { Input } from "@/components/ui/input";
-import { TimeInput } from "@/components/flight-form/time-input";
 import { NumberInput } from "@/components/flight-form/number-input";
 import { DecimalNumberInput } from "@/components/flight-form/decimal-number-input";
-import { ToggleSwitch } from "@/components/toggle-switch";
-import { DatePicker } from "@/components/ui/date-picker";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,6 +19,8 @@ import {
 } from "lucide-react";
 import type { FormField, SelectOption } from "@/lib/form-config";
 import type { FlightData } from "@/schemas/NEW/flights";
+import { TimePicker } from "@/components/ui/date/time-picker";
+import { Time } from "@internationalized/date";
 
 interface FormFieldRendererProps {
   field: FormField;
@@ -36,6 +35,10 @@ interface FormFieldRendererProps {
   };
 }
 
+type ValuePiece = Date | null;
+
+type Value = ValuePiece | [ValuePiece, ValuePiece];
+
 export function FormFieldRenderer({
   field,
   flightData,
@@ -43,8 +46,8 @@ export function FormFieldRenderer({
   openDialog,
   mockData = {},
 }: FormFieldRendererProps) {
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
-    flightData.date ? new Date(flightData.date) : undefined
+  const [date, setDate] = useState<Value>(
+    flightData.date ? new Date(flightData.date) : new Date()
   );
 
   const getDisplayText = (
@@ -90,14 +93,17 @@ export function FormFieldRenderer({
         <FormFieldComponent
           label={field.title}
           inputField={
-            <DatePicker
-              date={selectedDate}
-              onDateChange={(date) => {
-                setSelectedDate(date);
-                if (date) {
-                  updateFlightData(field.id, date.toISOString().split("T")[0]);
-                }
-              }}
+            <Input
+              type="date"
+              data-date=""
+              data-date-format="DD/MM/YYYY"
+              className="border-b border-t-0 border-l-0 border-r-0 rounded-none focus-visible:ring-0 px-0 py-0 h-7"
+              value={
+                date instanceof Date ? date.toISOString().split("T")[0] : ""
+              }
+              onChange={(e) =>
+                setDate(e.target.value ? new Date(e.target.value) : null)
+              }
             />
           }
         />
@@ -157,45 +163,37 @@ export function FormFieldRenderer({
         />
       );
 
-    case "toggle":
-      let checked = false;
+    // case "toggle":
+    //   let checked = false;
 
-      if (field.id === "pilotFlying") {
-        checked = flightData.isPilotFlying;
-      } else if (field.id === "outOfBase") {
-        checked = flightData.isOutOfBase;
-      }
+    //   if (field.id === "pilotFlying") {
+    //     checked = flightData.isPilotFlying;
+    //   } else if (field.id === "outOfBase") {
+    //     checked = flightData.isOutOfBase;
+    //   }
 
-      return (
-        <div className="px-4 py-3 flex justify-between items-center">
-          <span className="text-gray-700">{field.title}</span>
-          <ToggleSwitch
-            checked={checked}
-            onCheckedChange={(value) => {
-              if (field.id === "pilotFlying") {
-                updateFlightData("isPilotFlying", value);
-              } else if (field.id === "outOfBase") {
-                updateFlightData("isOutOfBase", value);
-              }
-            }}
-          />
-        </div>
-      );
+    //   return (
+    //     <div className="px-4 py-3 flex justify-between items-center">
+    //       <span className="text-gray-700">{field.title}</span>
+    //       <ToggleSwitch
+    //         checked={checked}
+    //         onCheckedChange={(value) => {
+    //           if (field.id === "pilotFlying") {
+    //             updateFlightData("isPilotFlying", value);
+    //           } else if (field.id === "outOfBase") {
+    //             updateFlightData("isOutOfBase", value);
+    //           }
+    //         }}
+    //       />
+    //     </div>
+    //   );
 
     case "number":
-      let numberValue = 0;
-
-      if (field.id === "autolands") {
-        numberValue = flightData.autolands;
-      } else if (field.id === "goArounds") {
-        numberValue = flightData.goArounds;
-      }
-
       return (
         <div className="flex items-center justify-between px-4 py-3">
           <span className="text-gray-700">{field.title}</span>
           <NumberInput
-            value={numberValue}
+            value={flightData.passengers}
             onChange={(value) => updateFlightData(field.id, value)}
           />
         </div>
@@ -203,24 +201,63 @@ export function FormFieldRenderer({
 
     case "time":
       return (
-        <div className="flex items-center gap-4 px-4 py-3">
-          <div className="text-gray-700 min-w-32">{field.title}</div>
-          <div className="flex-1">
-            <Input
-              value={getNestedValue(`durations.${field.id}`) || ""}
-              onChange={(e) =>
-                updateFlightData(`durations.${field.id}`, e.target.value)
-              }
-              placeholder={field.placeholder || "##:##"}
-              className="border-b border-t-0 border-l-0 border-r-0 rounded-none focus-visible:ring-0 px-0 w-full"
-            />
-          </div>
-          <div className="ml-2">
-            {field.id === "totalTime" ? (
-              <Edit className="h-5 w-5 text-gray-400" />
-            ) : (
-              <Edit className="h-5 w-5 text-orange-300" />
-            )}
+        <div className="flex justify-between items-center gap-4 px-4 py-3">
+          <div className="text-gray-700 min-w-36">{field.title}</div>
+          <div className="flex items-center gap-2">
+            <div className="flex-1 max-w-48">
+              <TimePicker
+                hourCycle={24}
+                hideTimeZone={true}
+                value={getNestedValue(`durations.${field.id}`) || ""}
+                onChange={(newValue) =>
+                  updateFlightData(`durations.${field.id}`, newValue)
+                }
+                aria-label={field.title}
+              />
+            </div>
+            <div className="ml-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-5 w-5 p-0"
+                onClick={() => {
+                  const blockTime = flightData.times?.block;
+                  if (blockTime?.start && blockTime?.end) {
+                    const [startHour, startMinute] = blockTime.start
+                      .split(":")
+                      .map(Number);
+                    const [endHour, endMinute] = blockTime.end
+                      .split(":")
+                      .map(Number);
+                    let hours = endHour - startHour;
+                    let minutes = endMinute - startMinute;
+
+                    if (hours < 0 || (hours === 0 && minutes < 0)) {
+                      hours += 24;
+                    }
+
+                    if (minutes < 0) {
+                      hours--;
+                      minutes += 60;
+                    }
+
+                    updateFlightData(
+                      `durations.${field.id}`,
+                      new Time(hours, minutes)
+                    );
+                  }
+                }}
+              >
+                <Edit
+                  className={`h-5 w-5 ${
+                    flightData.times?.block?.start &&
+                    flightData.times?.block?.end
+                      ? "text-blue-600"
+                      : "text-blue-300"
+                  }`}
+                />
+              </Button>
+            </div>
           </div>
         </div>
       );
@@ -431,7 +468,9 @@ export function FormFieldRenderer({
                         placeholder="0.0"
                       />
                       <div className="w-16 text-center text-gray-600">
-                        {(numericValue.end - numericValue.start).toFixed(1)}
+                        {numericValue.start && numericValue.end
+                          ? (numericValue.end - numericValue.start).toFixed(1)
+                          : "##.#"}
                       </div>
                     </div>
                   </div>
@@ -439,27 +478,87 @@ export function FormFieldRenderer({
               }
 
               const timeValue = value as { start: string; end: string };
+
               return (
                 <div key={key} className="flex items-center gap-4">
                   <div className="w-24 text-gray-700">
                     {key.charAt(0).toUpperCase() + key.slice(1)}
                   </div>
                   <div className="flex items-center gap-4">
-                    <TimeInput
-                      value={timeValue.start}
-                      onChange={(newValue) =>
-                        updateFlightData(`times.${key}.start`, newValue)
+                    <TimePicker
+                      hourCycle={24}
+                      hideTimeZone={false}
+                      value={
+                        timeValue.start
+                          ? new Time(
+                              parseInt(timeValue.start.split(":")[0]),
+                              parseInt(timeValue.start.split(":")[1])
+                            )
+                          : null
                       }
-                      className="w-16"
-                    />
-                    <TimeInput
-                      value={timeValue.end}
                       onChange={(newValue) =>
-                        updateFlightData(`times.${key}.end`, newValue)
+                        updateFlightData(
+                          `times.${key}.start`,
+                          `${newValue?.hour
+                            .toString()
+                            .padStart(2, "0")}:${newValue?.minute
+                            .toString()
+                            .padStart(2, "0")}`
+                        )
                       }
-                      className="w-16"
+                      aria-label={field.title}
                     />
-                    <div className="w-16 text-center text-gray-600">##:##</div>
+                    <TimePicker
+                      hourCycle={24}
+                      hideTimeZone={true}
+                      value={
+                        timeValue.end
+                          ? new Time(
+                              parseInt(timeValue.end.split(":")[0]),
+                              parseInt(timeValue.end.split(":")[1])
+                            )
+                          : null
+                      }
+                      onChange={(newValue) =>
+                        updateFlightData(
+                          `times.${key}.end`,
+                          `${newValue?.hour
+                            .toString()
+                            .padStart(2, "0")}:${newValue?.minute
+                            .toString()
+                            .padStart(2, "0")}`
+                        )
+                      }
+                      aria-label={field.title}
+                    />
+                    <div className="w-16 text-center text-gray-600">
+                      {timeValue.start && timeValue.end
+                        ? (() => {
+                            const [startHour, startMinute] = timeValue.start
+                              .split(":")
+                              .map(Number);
+                            const [endHour, endMinute] = timeValue.end
+                              .split(":")
+                              .map(Number);
+                            let hours = endHour - startHour;
+                            let minutes = endMinute - startMinute;
+
+                            if (hours < 0 || (hours === 0 && minutes < 0)) {
+                              hours += 24;
+                            }
+
+                            if (minutes < 0) {
+                              hours--;
+                              minutes += 60;
+                            }
+                            return `${hours
+                              .toString()
+                              .padStart(2, "0")}:${minutes
+                              .toString()
+                              .padStart(2, "0")}`;
+                          })()
+                        : "##:##"}
+                    </div>
                   </div>
                 </div>
               );

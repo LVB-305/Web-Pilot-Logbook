@@ -19,29 +19,32 @@ interface DatePickerProps {
 }
 
 export function DatePicker({ date, onDateChange }: DatePickerProps) {
+  console.log(date);
   return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button
-          variant={"outline"}
-          className={cn(
-            "w-full justify-center text-center font-normal",
-            !date && "text-muted-foreground"
-          )}
-        >
-          {date ? format(date, "dd/MM/yyyy") : <span>Pick a date</span>}
-          <CalendarIcon className="mr-2 h-4 w-4" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-auto p-0">
-        <Calendar
-          mode="single"
-          selected={date}
-          onSelect={onDateChange}
-          initialFocus
-          required
-        />
-      </PopoverContent>
-    </Popover>
+    <div className="flex items-center rounded-md ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button
+            variant={"outline"}
+            className={cn(
+              "w-full justify-center text-center font-normal",
+              !date && "text-muted-foreground"
+            )}
+          >
+            {date ? format(date, "dd/MM/yyyy") : <span>Pick a date</span>}
+            <CalendarIcon className="mr-2 h-4 w-4" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0">
+          <Calendar
+            mode="single"
+            selected={date}
+            onSelect={onDateChange}
+            initialFocus
+            required
+          />
+        </PopoverContent>
+      </Popover>
+    </div>
   );
 }
