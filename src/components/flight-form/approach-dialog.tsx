@@ -19,11 +19,6 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Check } from "lucide-react";
 
-interface Approach {
-  id: string;
-  label: string;
-}
-
 interface ApproachDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;

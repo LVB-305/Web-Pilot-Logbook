@@ -10,12 +10,10 @@ import { Button } from "@/components/ui/button";
 import {
   PenTool,
   ChevronDown,
-  Plane,
-  PlaneTakeoff,
-  PlaneLanding,
   User,
   Plus,
   Edit,
+  ChevronRight,
 } from "lucide-react";
 import type { FormField, SelectOption } from "@/lib/form-config";
 import type { FlightData } from "@/schemas/NEW/flights";
@@ -25,13 +23,26 @@ import { Time } from "@internationalized/date";
 interface FormFieldRendererProps {
   field: FormField;
   flightData: FlightData;
-  updateFlightData: (path: string, value: any) => void;
-  openDialog: (dialogType: string, data?: any) => void;
+  updateFlightData: (
+    path: string,
+    value:
+      | string
+      | number
+      | boolean
+      | Time
+      | null
+      | { id: string; count: number }[]
+  ) => void;
+  openDialog: (
+    dialogType: string,
+    data?: { options?: SelectOption[] } | { id: string; count: number }
+  ) => void;
   mockData?: {
     registrations?: SelectOption[];
     airports?: SelectOption[];
     crewMembers?: SelectOption[];
     approaches?: Array<{ id: string; label: string }>;
+    simulatorTypes?: SelectOption[];
   };
 }
 
@@ -62,11 +73,11 @@ export function FormFieldRenderer({
   // Helper function to get nested value from flightData
   const getNestedValue = (path: string) => {
     const parts = path.split(".");
-    let value: any = flightData;
+    let value: unknown = flightData as FlightData;
 
     for (const part of parts) {
       if (value === undefined || value === null) return undefined;
-      value = value[part];
+      value = (value as Record<string, unknown>)[part];
     }
 
     return value;
@@ -79,7 +90,7 @@ export function FormFieldRenderer({
           label={field.title}
           inputField={
             <Input
-              value={getNestedValue(field.id) || ""}
+              value={(getNestedValue(field.id) as string) || ""}
               onChange={(e) => updateFlightData(field.id, e.target.value)}
               placeholder={field.placeholder}
               className="border-b border-t-0 border-l-0 border-r-0 rounded-none focus-visible:ring-0 px-0"
@@ -99,7 +110,9 @@ export function FormFieldRenderer({
               data-date-format="DD/MM/YYYY"
               className="border-b border-t-0 border-l-0 border-r-0 rounded-none focus-visible:ring-0 px-0 py-0 h-7"
               value={
-                date instanceof Date ? date.toISOString().split("T")[0] : ""
+                date instanceof Date
+                  ? date.toISOString().split("T")[0]
+                  : new Date().toISOString().split("T")[0]
               }
               onChange={(e) =>
                 setDate(e.target.value ? new Date(e.target.value) : null)
@@ -121,24 +134,24 @@ export function FormFieldRenderer({
         displayValue =
           getDisplayText(mockData.registrations, value) ??
           field.placeholder ??
-          "Select...";
-        icon = <Plane className="h-5 w-5 text-blue-600" />;
+          "Select";
+        icon = <ChevronRight className="h-5 w-5 text-blue-600" />;
         options = mockData.registrations || [];
       } else if (field.id === "departure") {
         value = flightData.departure;
         displayValue =
           getDisplayText(mockData.airports, value) ??
           field.placeholder ??
-          "Select...";
-        icon = <PlaneTakeoff className="h-5 w-5 text-blue-600" />;
+          "Select";
+        icon = <ChevronRight className="h-5 w-5 text-blue-600" />;
         options = mockData.airports || [];
       } else if (field.id === "destination") {
         value = flightData.destination;
         displayValue =
           getDisplayText(mockData.airports, value) ??
           field.placeholder ??
-          "Select...";
-        icon = <PlaneLanding className="h-5 w-5 text-blue-600" />;
+          "Select";
+        icon = <ChevronRight className="h-5 w-5 text-blue-600" />;
         options = mockData.airports || [];
       } else if (field.id === "pic") {
         value = flightData.pic;
@@ -150,7 +163,7 @@ export function FormFieldRenderer({
         options = mockData.crewMembers || [];
       } else if (field.id === "dutyType") {
         value = flightData.dutyType;
-        displayValue = value || field.placeholder || "Select...";
+        displayValue = value || field.placeholder || "Select";
       }
 
       return (
@@ -200,6 +213,10 @@ export function FormFieldRenderer({
       );
 
     case "time":
+      const path =
+        field.id === "sessionTime"
+          ? `durations.sessionTime`
+          : `durations.${field.id}`;
       return (
         <div className="flex justify-between items-center gap-4 px-4 py-3">
           <div className="text-gray-700 min-w-36">{field.title}</div>
@@ -208,9 +225,12 @@ export function FormFieldRenderer({
               <TimePicker
                 hourCycle={24}
                 hideTimeZone={true}
-                value={getNestedValue(`durations.${field.id}`) || ""}
+                value={(getNestedValue(path) as Time | null) || null}
                 onChange={(newValue) =>
-                  updateFlightData(`durations.${field.id}`, newValue)
+                  updateFlightData(
+                    path,
+                    newValue ? new Time(newValue.hour, newValue.minute) : null
+                  )
                 }
                 aria-label={field.title}
               />
@@ -219,7 +239,7 @@ export function FormFieldRenderer({
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-5 w-5 p-0"
+                className="h-5 w-5 p-4"
                 onClick={() => {
                   const blockTime = flightData.times?.block;
                   if (blockTime?.start && blockTime?.end) {
@@ -241,10 +261,7 @@ export function FormFieldRenderer({
                       minutes += 60;
                     }
 
-                    updateFlightData(
-                      `durations.${field.id}`,
-                      new Time(hours, minutes)
-                    );
+                    updateFlightData(path, new Time(hours, minutes));
                   }
                 }}
               >
@@ -267,7 +284,7 @@ export function FormFieldRenderer({
         <div className="space-y-2 px-4 py-3">
           <label className="text-sm font-medium">{field.title}</label>
           <Textarea
-            value={getNestedValue(`remarks.${field.id}`) || ""}
+            value={(getNestedValue(`remarks.${field.id}`) as string) || ""}
             onChange={(e) =>
               updateFlightData(`remarks.${field.id}`, e.target.value)
             }
@@ -297,11 +314,11 @@ export function FormFieldRenderer({
                 </Button>
               </div>
               <div className="border rounded-md p-2">
-                <img
+                {/* <img
                   src={flightData.signature.data || "/placeholder.svg"}
                   alt="Signature"
                   className="max-h-20 w-auto mx-auto"
-                />
+                /> */}
               </div>
             </div>
           ) : (

@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { SelectionDialog } from "../selection-dialog";
+import { SelectionDialog } from "./selection-dialog";
 import { ApproachDialog } from "../approach-dialog";
 import { ApproachEditDialog } from "../approach-edit-dialog";
 import { SignatureDialog } from "../signature-dialog";
@@ -174,10 +174,10 @@ export default function FlightForm({
 
       {/* Selection Dialogs */}
       <SelectionDialog
-        open={registrationDialogOpen}
-        onOpenChange={setRegistrationDialogOpen}
+        isOpen={registrationDialogOpen}
+        onClose={() => setRegistrationDialogOpen(false)}
         title="Select Aircraft"
-        searchPlaceholder="Search registrations..."
+        searchPlaceholder="Search aircraft"
         items={mockRegistrations}
         value={flightData.registration}
         onValueChange={(value) => updateFlightData("registration", value)}
@@ -185,10 +185,10 @@ export default function FlightForm({
       />
 
       <SelectionDialog
-        open={departureDialogOpen}
-        onOpenChange={setDepartureDialogOpen}
+        isOpen={departureDialogOpen}
+        onClose={() => setDepartureDialogOpen(false)}
         title="Select Departure Airport"
-        searchPlaceholder="Search airports..."
+        searchPlaceholder="Search airports"
         items={mockAirports}
         value={flightData.departure}
         onValueChange={(value) => updateFlightData("departure", value)}
@@ -196,8 +196,8 @@ export default function FlightForm({
       />
 
       <SelectionDialog
-        open={destinationDialogOpen}
-        onOpenChange={setDestinationDialogOpen}
+        isOpen={destinationDialogOpen}
+        onClose={() => setDestinationDialogOpen(false)}
         title="Select Destination Airport"
         searchPlaceholder="Search airports"
         items={mockAirports}
@@ -207,10 +207,10 @@ export default function FlightForm({
       />
 
       <SelectionDialog
-        open={picDialogOpen}
-        onOpenChange={setPicDialogOpen}
+        isOpen={picDialogOpen}
+        onClose={() => setPicDialogOpen(false)}
         title="Select PIC"
-        searchPlaceholder="Search crew members..."
+        searchPlaceholder="Search crew members"
         items={mockCrewMembers}
         value={flightData.pic}
         onValueChange={(value) => updateFlightData("pic", value)}

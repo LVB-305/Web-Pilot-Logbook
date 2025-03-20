@@ -29,7 +29,7 @@ export function SearchCommand({
   const [search, setSearch] = React.useState("");
 
   return (
-    <Command className="rounded-lg border shadow-md">
+    <Command className="bg-[#f5f5f5] rounded-none">
       <CommandInput
         placeholder={placeholder}
         value={search}
@@ -37,7 +37,7 @@ export function SearchCommand({
       />
       <CommandList>
         <CommandEmpty>{emptyMessage}</CommandEmpty>
-        <CommandGroup className="max-h-[300px] overflow-auto">
+        <CommandGroup className="overflow-auto">
           {items
             .filter(
               (item) =>
@@ -52,7 +52,7 @@ export function SearchCommand({
                   onValueChange(item.value);
                   setSearch("");
                 }}
-                className="flex items-center justify-between"
+                className="flex items-center justify-between cursor-pointer border-b p-3 rounded-none"
               >
                 <span>{item.label}</span>
                 {value === item.value && <Check className="h-4 w-4" />}

@@ -30,7 +30,7 @@ export function ColumnsOverlay({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent
-        className="w-full h-full max-w-full sm:min-h-[500px] md:max-w-[40vw] md:max-h-[60vh] p-0 gap-0 bg-[#f5f5f5] dark:bg-zinc-900 [&>button]:hidden flex flex-col"
+        className="w-full h-full max-w-full sm:min-h-[500px] md:max-w-md md:max-h-[60vh] p-0 gap-0 bg-[#f5f5f5] dark:bg-zinc-900 [&>button]:hidden flex flex-col"
         aria-describedby={undefined}
       >
         <div className="flex items-center justify-between p-4 border-b">
