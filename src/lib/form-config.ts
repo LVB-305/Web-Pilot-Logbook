@@ -12,7 +12,8 @@ export type InputType =
   | "timeRanges"
   | "timeDurations"
   | "textarea"
-  | "signature";
+  | "signature"
+  | "simulatorSession";
 
 // Define the structure for select options
 export interface SelectOption {
@@ -28,6 +29,7 @@ export interface FormField {
   placeholder?: string;
   options?: SelectOption[];
   required?: boolean;
+  showFor?: string[];
 }
 
 // Define the structure for a form section
@@ -37,6 +39,7 @@ export interface FormSection {
   fields: FormField[];
   collapsible?: boolean;
   defaultOpen?: boolean;
+  showFor?: string[];
 }
 
 // Define the flight form configuration
@@ -60,7 +63,6 @@ export const flightFormConfig: FormSection[] = [
         options: [
           { value: "Flight", label: "Flight" },
           { value: "Simulator", label: "Simulator" },
-          { value: "Training", label: "Training" },
         ],
         required: true,
       },
@@ -74,19 +76,29 @@ export const flightFormConfig: FormSection[] = [
         id: "registration",
         title: "Registration",
         type: "select",
-        placeholder: "Select registration",
+        placeholder: "",
+        showFor: ["Flight"],
+      },
+      {
+        id: "simulatorType",
+        title: "Simulator Type",
+        type: "select",
+        placeholder: "",
+        showFor: ["Simulator"],
       },
       {
         id: "departure",
         title: "Departure",
         type: "select",
-        placeholder: "Add departure",
+        placeholder: "",
+        showFor: ["Flight"],
       },
       {
         id: "destination",
         title: "Destination",
         type: "select",
-        placeholder: "Add destination",
+        placeholder: "",
+        showFor: ["Flight"],
       },
     ],
   },
@@ -95,6 +107,7 @@ export const flightFormConfig: FormSection[] = [
     title: "Takeoffs / Landings",
     collapsible: true,
     defaultOpen: true,
+    showFor: ["Flight"],
     fields: [
       // {
       //   id: "pilotFlying",
@@ -192,10 +205,27 @@ export const flightFormConfig: FormSection[] = [
     ],
   },
   {
+    id: "simulatorSession",
+    title: "Simulator Session",
+    collapsible: true,
+    defaultOpen: true,
+    showFor: ["Simulator"],
+    fields: [
+      {
+        id: "sessionTime",
+        title: "Session Time",
+        type: "time",
+        placeholder: "##:##",
+        required: true,
+      },
+    ],
+  },
+  {
     id: "approaches",
     title: "Approaches",
     collapsible: true,
     defaultOpen: true,
+    showFor: ["Flight"],
     fields: [
       {
         id: "approaches",
@@ -209,6 +239,7 @@ export const flightFormConfig: FormSection[] = [
     title: "Other Items",
     collapsible: true,
     defaultOpen: true,
+    showFor: ["Flight"],
     fields: [
       {
         id: "passengers",
@@ -222,6 +253,7 @@ export const flightFormConfig: FormSection[] = [
     title: "Remarks",
     collapsible: true,
     defaultOpen: true,
+    showFor: ["Flight"],
     fields: [
       {
         id: "general",

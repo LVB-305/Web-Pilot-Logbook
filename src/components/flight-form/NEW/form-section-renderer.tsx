@@ -11,6 +11,7 @@ interface FormSectionRendererProps {
   updateFlightData: (path: string, value: unknown) => void;
   openDialog: (dialogType: string, data?: Record<string, unknown>) => void;
   mockData?: Record<string, unknown>;
+  errors?: Record<string, string>;
 }
 
 export function FormSectionRenderer({
@@ -19,7 +20,22 @@ export function FormSectionRenderer({
   updateFlightData,
   openDialog,
   mockData,
+  errors = {},
 }: FormSectionRendererProps) {
+  // Check if this section should be shown for the current duty type
+  if (section.showFor && !section.showFor.includes(flightData.dutyType)) {
+    return null;
+  }
+
+  // Check if this section has any errors
+  const sectionHasErrors = Object.keys(errors).some((key) => {
+    // Check if the error key starts with the section id
+    // or if it's a direct field in this section
+    return (
+      key.startsWith(section.id) ||
+      section.fields.some((field) => key === field.id)
+    );
+  });
   return (
     <FormSectionComponent
       title={section.title}
@@ -27,16 +43,23 @@ export function FormSectionRenderer({
       defaultOpen={section.defaultOpen}
       className="mb-6"
     >
-      {section.fields.map((field) => (
-        <FormFieldRenderer
-          key={field.id}
-          field={field}
-          flightData={flightData}
-          updateFlightData={updateFlightData}
-          openDialog={openDialog}
-          mockData={mockData}
-        />
-      ))}
+      {section.fields.map((field) => {
+        // Skip fields that shouldn't be shown for the current duty type
+        if (field.showFor && !field.showFor.includes(flightData.dutyType)) {
+          return null;
+        }
+
+        return (
+          <FormFieldRenderer
+            key={field.id}
+            field={field}
+            flightData={flightData}
+            updateFlightData={updateFlightData}
+            openDialog={openDialog}
+            mockData={mockData}
+          />
+        );
+      })}
     </FormSectionComponent>
   );
 }

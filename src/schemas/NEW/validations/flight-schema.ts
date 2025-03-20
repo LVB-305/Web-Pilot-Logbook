@@ -27,11 +27,33 @@ const approachSchema = z.object({
   count: z.number().int().min(1),
 });
 
-// Create a schema for the flight data
-export const flightSchema = z.object({
+const baseFlightSchema = z.object({
   date: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, { message: "Date is required" }),
+  pic: z.string().min(1, { message: "PIC is required" }),
+  remarks: z.object({
+    general: z.string().optional(),
+    training: z.string().optional(),
+  }),
+  signature: z
+    .object({
+      data: z.string(),
+      name: z.string().min(1, { message: "Name is required" }),
+      licenseNumber: z
+        .string()
+        .min(1, { message: "License number is required" }),
+    })
+    .nullable(),
+});
+
+// Create a schema for the flight data
+const flightDutySchema = z.object({
+  dutyType: z.literal("Flight"),
+  ...baseFlightSchema.shape,
+  // date: z
+  //   .string()
+  //   .regex(/^\d{4}-\d{2}-\d{2}$/, { message: "Date is required" }),
   //   dutyType: z.string().min(1, { message: "Duty type is required" }),
   //   flightNumber: z.string().optional(),
   //   registration: z.string().min(1, { message: "Registration is required" }),
@@ -48,7 +70,7 @@ export const flightSchema = z.object({
   nightLandings: z.number().int().min(0),
   approaches: z.array(approachSchema),
 
-  pic: z.string().min(1, { message: "PIC is required" }),
+  // pic: z.string().min(1, { message: "PIC is required" }),
 
   // TIMINGS
   times: z.object({
@@ -100,21 +122,75 @@ export const flightSchema = z.object({
     // flightPay: z.string().optional(),
     passengers: z.string().optional(),
   }),
-  remarks: z.object({
-    general: z.string().optional(),
-    training: z.string().optional(),
-  }),
-  signature: z
-    .object({
-      data: z.string(),
-      name: z.string().min(1, { message: "Name is required" }),
-      licenseNumber: z
-        .string()
-        .min(1, { message: "License number is required" }),
-    })
-    .nullable()
-    .optional(),
+  // remarks: z.object({
+  //   general: z.string().optional(),
+  //   training: z.string().optional(),
+  // }),
+  // signature: z
+  //   .object({
+  //     data: z.string(),
+  //     name: z.string().min(1, { message: "Name is required" }),
+  //     licenseNumber: z
+  //       .string()
+  //       .min(1, { message: "License number is required" }),
+  //   })
+  //   .nullable()
+  //   .optional(),
 });
+
+const simulatorDutySchema = z.object({
+  dutyType: z.literal("Simulator"),
+  ...baseFlightSchema.shape,
+  simulatorType: z.string().min(1, { message: "Simulator type is required" }),
+  durations: z.object({
+    sessionTime: z
+      .string()
+      .regex(timePattern, { message: "Invalid time format (HH:MM)" }),
+  }),
+});
+
+// Create a discriminated union schema based on dutyType
+// const flightSchema = z.discriminatedUnion("dutyType", [
+//   // Flight schema
+//   z.object({
+//     dutyType: z.literal("Flight"),
+//     ...baseFlightSchema.shape,
+//     ...flightDutySchema.shape,
+//   }),
+//   // Simulator schema
+//   z.object({
+//     dutyType: z.literal("Simulator"),
+//     ...baseFlightSchema.shape,
+//     ...simulatorDutySchema.shape,
+//     // Include optional fields that might be present in the data but not required for Simulator
+//     registration: z.string().optional(),
+//     departure: z.string().optional(),
+//     destination: z.string().optional(),
+//     dayTakeoffs: z.number().optional(),
+//     nightTakeoffs: z.number().optional(),
+//     dayLandings: z.number().optional(),
+//     nightLandings: z.number().optional(),
+//     approaches: z.array(approachSchema).optional(),
+//     times: z
+//       .object({
+//         block: timeRangeSchema,
+//         flight: timeRangeSchema,
+//         hobbs: numericRangeSchema,
+//         // tach: numericRangeSchema,
+//       })
+//       .optional(),
+//     otherItems: z
+//       .object({
+//         passsengers: z.string().optional(),
+//       })
+//       .optional(),
+//   }),
+// ]);
+
+export const flightSchema = z.discriminatedUnion("dutyType", [
+  flightDutySchema,
+  simulatorDutySchema,
+]);
 
 // Create a type from the schema
 export type FlightFormData = z.infer<typeof flightSchema>;

@@ -6,11 +6,10 @@ export interface TimeRange {
 export interface FlightData {
   date: string;
   dutyType: string;
-  flightNumber: string;
   registration: string;
+  simulatorType: string;
   departure: string;
   destination: string;
-  // isPilotFlying: boolean;
   dayTakeoffs: number;
   nightTakeoffs: number;
   dayLandings: number;
@@ -30,12 +29,19 @@ export interface FlightData {
     // };
   };
   durations: {
-    totalTime: string;
-    actualInstrument: string;
-    dualGiven: string;
-    dualReceived: string;
+    totalBlockTime: string;
+    ifrTime: string;
+    nightTime: string;
+    xcTime: string;
+    picTime: string;
+    copilotTime: string;
+    dualTime: string;
+    instructorTime: string;
+    sessionTime: string;
   };
-  passengers: number;
+  otherItems: {
+    passengers: number;
+  };
   remarks: {
     general: string;
     training: string;
@@ -50,8 +56,8 @@ export interface FlightData {
 export const defaultFlightData: FlightData = {
   date: new Date().toISOString().split("T")[0],
   dutyType: "Flight",
-  flightNumber: "",
   registration: "",
+  simulatorType: "",
   departure: "",
   destination: "",
   // isPilotFlying: false,
@@ -68,12 +74,19 @@ export const defaultFlightData: FlightData = {
     // tach: { start: 0, end: 0 },
   },
   durations: {
-    totalTime: "",
-    actualInstrument: "",
-    dualGiven: "",
-    dualReceived: "",
+    totalBlockTime: "",
+    ifrTime: "",
+    nightTime: "",
+    xcTime: "",
+    picTime: "",
+    copilotTime: "",
+    dualTime: "",
+    instructorTime: "",
+    sessionTime: "",
   },
-  passengers: 0,
+  otherItems: {
+    passengers: 0,
+  },
   remarks: {
     general: "",
     training: "",

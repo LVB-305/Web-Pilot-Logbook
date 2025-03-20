@@ -7,31 +7,42 @@ import { NumberInput } from "@/components/flight-form/number-input";
 import { DecimalNumberInput } from "@/components/flight-form/decimal-number-input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { TimePicker } from "@/components/ui/date/time-picker";
 import {
   PenTool,
   ChevronDown,
-  Plane,
-  PlaneTakeoff,
-  PlaneLanding,
   User,
   Plus,
   Edit,
+  ChevronRight,
 } from "lucide-react";
 import type { FormField, SelectOption } from "@/lib/form-config";
 import type { FlightData } from "@/schemas/NEW/flights";
-import { TimePicker } from "@/components/ui/date/time-picker";
 import { Time } from "@internationalized/date";
 
 interface FormFieldRendererProps {
   field: FormField;
   flightData: FlightData;
-  updateFlightData: (path: string, value: any) => void;
-  openDialog: (dialogType: string, data?: any) => void;
+  updateFlightData: (
+    path: string,
+    value:
+      | string
+      | number
+      | boolean
+      | Time
+      | null
+      | { id: string; count: number }[]
+  ) => void;
+  openDialog: (
+    dialogType: string,
+    data?: { options?: SelectOption[] } | { id: string; count: number }
+  ) => void;
   mockData?: {
     registrations?: SelectOption[];
     airports?: SelectOption[];
     crewMembers?: SelectOption[];
     approaches?: Array<{ id: string; label: string }>;
+    simulatorTypes?: SelectOption[];
   };
 }
 
@@ -62,11 +73,11 @@ export function FormFieldRenderer({
   // Helper function to get nested value from flightData
   const getNestedValue = (path: string) => {
     const parts = path.split(".");
-    let value: any = flightData;
+    let value: unknown = flightData as FlightData;
 
     for (const part of parts) {
       if (value === undefined || value === null) return undefined;
-      value = value[part];
+      value = (value as Record<string, unknown>)[part];
     }
 
     return value;
@@ -79,7 +90,7 @@ export function FormFieldRenderer({
           label={field.title}
           inputField={
             <Input
-              value={getNestedValue(field.id) || ""}
+              value={(getNestedValue(field.id) as string) || ""}
               onChange={(e) => updateFlightData(field.id, e.target.value)}
               placeholder={field.placeholder}
               className="border-b border-t-0 border-l-0 border-r-0 rounded-none focus-visible:ring-0 px-0"
@@ -116,13 +127,27 @@ export function FormFieldRenderer({
       let options: SelectOption[] = [];
 
       // Determine which select field this is and set appropriate values
-      if (field.id === "registration") {
+      if (field.id === "dutyType") {
+        value = flightData.dutyType;
+        displayValue = value || field.placeholder || "Select...";
+        icon = <ChevronDown className="h-5 w-5 text-blue-600" />;
+
+        return (
+          <FormFieldComponent
+            label={field.title}
+            value={displayValue}
+            icon={icon}
+            onClick={handleDutyTypeChange}
+            className="cursor-pointer"
+          />
+        );
+      } else if (field.id === "registration") {
         value = flightData.registration;
         displayValue =
           getDisplayText(mockData.registrations, value) ??
           field.placeholder ??
           "Select...";
-        icon = <Plane className="h-5 w-5 text-blue-600" />;
+        icon = <ChevronRight className="h-5 w-5 text-blue-600" />;
         options = mockData.registrations || [];
       } else if (field.id === "departure") {
         value = flightData.departure;
@@ -130,7 +155,7 @@ export function FormFieldRenderer({
           getDisplayText(mockData.airports, value) ??
           field.placeholder ??
           "Select...";
-        icon = <PlaneTakeoff className="h-5 w-5 text-blue-600" />;
+        icon = <ChevronRight className="h-5 w-5 text-blue-600" />;
         options = mockData.airports || [];
       } else if (field.id === "destination") {
         value = flightData.destination;
@@ -138,7 +163,7 @@ export function FormFieldRenderer({
           getDisplayText(mockData.airports, value) ??
           field.placeholder ??
           "Select...";
-        icon = <PlaneLanding className="h-5 w-5 text-blue-600" />;
+        icon = <ChevronRight className="h-5 w-5 text-blue-600" />;
         options = mockData.airports || [];
       } else if (field.id === "pic") {
         value = flightData.pic;
@@ -148,9 +173,14 @@ export function FormFieldRenderer({
           "Select...";
         icon = <User className="h-5 w-5 text-blue-600" />;
         options = mockData.crewMembers || [];
-      } else if (field.id === "dutyType") {
-        value = flightData.dutyType;
-        displayValue = value || field.placeholder || "Select...";
+      } else if (field.id === "simulatorType") {
+        value = flightData.simulatorType || "";
+        displayValue =
+          getDisplayText(mockData.simulatorTypes, value) ??
+          field.placeholder ??
+          "Select...";
+        icon = <ChevronRight className="h-5 w-5 text-blue-500" />;
+        options = mockData.simulatorTypes || [];
       }
 
       return (
@@ -190,16 +220,20 @@ export function FormFieldRenderer({
 
     case "number":
       return (
-        <div className="flex items-center justify-between px-4 py-3">
+        <div className="flex items-center justify-between p-4">
           <span className="text-gray-700">{field.title}</span>
           <NumberInput
-            value={flightData.passengers}
+            value={(getNestedValue(field.id) as number) || 0}
             onChange={(value) => updateFlightData(field.id, value)}
           />
         </div>
       );
 
     case "time":
+      const path =
+        field.id === "sessionTime"
+          ? `durations.sessionTime`
+          : `durations.${field.id}`;
       return (
         <div className="flex justify-between items-center gap-4 px-4 py-3">
           <div className="text-gray-700 min-w-36">{field.title}</div>
@@ -208,9 +242,12 @@ export function FormFieldRenderer({
               <TimePicker
                 hourCycle={24}
                 hideTimeZone={true}
-                value={getNestedValue(`durations.${field.id}`) || ""}
+                value={(getNestedValue(path) as Time | null) || null}
                 onChange={(newValue) =>
-                  updateFlightData(`durations.${field.id}`, newValue)
+                  updateFlightData(
+                    path,
+                    newValue ? new Time(newValue.hour, newValue.minute) : null
+                  )
                 }
                 aria-label={field.title}
               />
@@ -219,7 +256,7 @@ export function FormFieldRenderer({
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-5 w-5 p-0"
+                className="h-5 w-5 p-4"
                 onClick={() => {
                   const blockTime = flightData.times?.block;
                   if (blockTime?.start && blockTime?.end) {
@@ -241,10 +278,7 @@ export function FormFieldRenderer({
                       minutes += 60;
                     }
 
-                    updateFlightData(
-                      `durations.${field.id}`,
-                      new Time(hours, minutes)
-                    );
+                    updateFlightData(path, new Time(hours, minutes));
                   }
                 }}
               >
@@ -267,7 +301,7 @@ export function FormFieldRenderer({
         <div className="space-y-2 px-4 py-3">
           <label className="text-sm font-medium">{field.title}</label>
           <Textarea
-            value={getNestedValue(`remarks.${field.id}`) || ""}
+            value={(getNestedValue(`remarks.${field.id}`) as string) || ""}
             onChange={(e) =>
               updateFlightData(`remarks.${field.id}`, e.target.value)
             }
@@ -297,11 +331,11 @@ export function FormFieldRenderer({
                 </Button>
               </div>
               <div className="border rounded-md p-2">
-                <img
+                {/* <img
                   src={flightData.signature.data || "/placeholder.svg"}
                   alt="Signature"
                   className="max-h-20 w-auto mx-auto"
-                />
+                /> */}
               </div>
             </div>
           ) : (

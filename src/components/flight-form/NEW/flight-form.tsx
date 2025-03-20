@@ -41,6 +41,14 @@ const mockCrewMembers = [
   { value: "cm3", label: "Crew Member 3" },
 ];
 
+export const mockSimulatorTypes = [
+  { value: "B737", label: "Boeing 737 FFS" },
+  { value: "A320", label: "Airbus A320 FFS" },
+  { value: "B777", label: "Boeing 777 FFS" },
+  { value: "A350", label: "Airbus A350 FFS" },
+  { value: "FNPT2", label: "FNPT II MCC" },
+];
+
 interface FlightFormProps {
   mode: "new" | "edit";
   flightId?: string;
@@ -67,6 +75,7 @@ export default function FlightForm({
     (typeof flightData.approaches)[0] | null
   >(null);
   const [signatureDialogOpen, setSignatureDialogOpen] = useState(false);
+  const [simulatorTypeDialogOpen, setSimulatorTypeDialogOpen] = useState(false);
 
   // Helper function to update nested flight data
   const updateFlightData = (path: string, value: any) => {
@@ -88,6 +97,24 @@ export default function FlightForm({
 
       return newData;
     });
+  };
+
+  const handleDutyTypeChange = (newDutyType: "Flight" | "Simulator") => {
+    // Only proceed if the duty type is actually changing
+    if (newDutyType === flightData.dutyType) return;
+
+    // Create a new flight data object with the default values
+    const newFlightData = {
+      ...defaultFlightData,
+      // Preserve common fields
+      date: flightData.date,
+      pic: flightData.pic,
+      remarks: flightData.remarks,
+      signature: flightData.signature,
+      dutyType: newDutyType,
+    };
+
+    setFlightData(newFlightData);
   };
 
   // Handle dialog opening
@@ -114,6 +141,12 @@ export default function FlightForm({
       case "signature":
         setSignatureDialogOpen(true);
         break;
+      case "simulatorType":
+        setSimulatorTypeDialogOpen(true);
+        break;
+      case "dutyType":
+        handleDutyTypeChange(flightData.dutyType === "Flight" ? "Simulator" : "Flight");
+        break;
       default:
         console.warn(`Unknown dialog type: ${dialogType}`);
     }
@@ -139,6 +172,7 @@ export default function FlightForm({
     airports: mockAirports,
     crewMembers: mockCrewMembers,
     approaches: mockApproaches,
+    simulatorTypes: mockSimulatorTypes,
   };
 
   return (
@@ -272,6 +306,17 @@ export default function FlightForm({
               }
             : undefined
         }
+      />
+
+      <SelectionDialog
+        open={simulatorTypeDialogOpen}
+        onOpenChange={setSimulatorTypeDialogOpen}
+        title="Select Simulator Type"
+        searchPlaceholder="Search simulator types..."
+        items={mockSimulatorTypes}
+        value={flightData.simulatorType}
+        onValueChange={(value) => updateFlightData("simulatorType", value)}
+        emptyMessage="No simulator types found."
       />
     </div>
   );
